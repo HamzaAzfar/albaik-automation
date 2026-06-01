@@ -520,4 +520,25 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Scroll down "2" lines
     Then Verify that the "Female" text is displayed
 
-
+@smoke @editlocation
+  Scenario: Edit saved location and verify on map
+    Given The Albaik application is launched on physical device
+    # Then Verify that the "Skip" text is displayed
+    # Then Click on "Skip" button
+    # Then Click on "android:id/content" button
+    # Then Click on "Sign In" button
+    # Then Enter "532255875" into "5XXXXXXXX" Input
+    # Then Enter "11223344" as password
+    # Then Click on "Sign In" button
+    # Then wait for "10" Seconds
+    # Then Click on "ChannelPicker" button
+    Then Click on "Delivery" button
+    Then Click on "Choose an address" button
+    Then wait for "5" Seconds
+    Then Swipe left "2" times
+    # Then Click on "Virtual Force" button
+    # Then Click on "Choose this location" button
+    # Then Click on "Choose this location" button
+    # Then Scroll down "2" lines
+    # Then Click on "Edit Location" button
+    # Then Click on "Confirm new location" button
