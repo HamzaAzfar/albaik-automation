@@ -53,6 +53,10 @@ Then(/^wait for "?(\d+)"? [sS]econds?\s*$/, { timeout: 600000 }, async (seconds:
   await commonFunctionPage.wait_for_seconds(parseInt(seconds));
 });
 
+Then('Complete dynamic checkout with CVV {string}', async (cvv: string) => {
+    await commonFunctionPage.handle_dynamic_checkout(cvv);
+});
+
 Then(/^Scroll down "(\d+)" lines?$/, async (lines: string) => {
   await commonFunctionPage.scrollDownLines(parseInt(lines));
 });
@@ -106,4 +110,16 @@ Then(
 
 When('I redirect to branch {string} to bypass QR scan', async (branchId: string) => {
     await commonFunctionPage.redirectToBranchViaIntent(branchId);
+});
+
+Then(/^I capture the total amount with locator "([^"]*)" and store it as "([^"]*)"$/, async (locator: string, key: string) => {
+    await commonFunctionPage.captureAndStoreAmount(locator, key);
+});
+
+Then(/^I compare both stored amounts "([^"]*)" and "([^"]*)" and pass$/, async (key1: string, key2: string) => {
+    await commonFunctionPage.compareStoredAmounts(key1, key2);
+});
+
+Then(/^Open the link "([^"]*)" in mobile browser$/, async (url: string) => {
+    await commonFunctionPage.openLinkInMobileBrowser(url);
 });

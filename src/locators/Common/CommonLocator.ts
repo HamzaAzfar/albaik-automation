@@ -55,6 +55,10 @@ export const CommonLocators = {
   noticePopupText: [
     '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]',
   ],
+      totalAmountText: "//android.widget.TextView[contains(@text, '﷼')]",
+      basketTotalAmount: "(//android.widget.TextView[contains(@text, '﷼')])[last()]",
+      checkoutTotalAmount: "//android.widget.TextView[contains(@text, '﷼')]",
+
 
   noticeCloseButton: [
     '//android.view.ViewGroup[@content-desc="Close"]',
@@ -115,7 +119,8 @@ export const CommonLocators = {
       'Restaurant dashboard': "//a[normalize-space()='Restaurant dashboard']",
       'Print Receipt & Start Collecting': "//button[normalize-space()='Print Receipt & Start Collecting']",
       'OK': "//button[normalize-space()='OK']",
-      'Prepared': "//button[normalize-space()='Prepared']"
+      'Prepared': "//button[normalize-space()='Prepared']",
+      'Fail': "//button[normalize-space()='Fail']"
     };
     return predefined[href] || `//a[@href="${href}"]`;
   },
@@ -134,10 +139,10 @@ export const CommonLocators = {
   cardEndingWith: (lastFourDigits: string) => `//android.view.ViewGroup[@content-desc="ENDING, ${lastFourDigits}"]/com.horcrux.svg.SvgView/com.horcrux.svg.g/com.horcrux.svg.p`,
   ChannelPicker: '//android.view.ViewGroup[@resource-id="ChannelPicker"]/android.view.ViewGroup/com.horcrux.svg.SvgView',
   'android:id/content': [
-    '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[3]/com.horcrux.svg.SvgView/com.horcrux.svg.g/Ca1',
-    '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[4]/com.horcrux.svg.SvgView/com.horcrux.svg.g/Ca1',
     '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[4]/com.horcrux.svg.SvgView/com.horcrux.svg.g/ya1',
-    '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[3]/com.horcrux.svg.SvgView/com.horcrux.svg.g/ya1'
+    '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[3]/com.horcrux.svg.SvgView/com.horcrux.svg.g/ya1',
+    '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[3]/com.horcrux.svg.SvgView/com.horcrux.svg.g/Ca1',
+    '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup[2]/android.view.ViewGroup[4]/com.horcrux.svg.SvgView/com.horcrux.svg.g/Ca1'
   ],
 
   // --- Driver App Locators ---
@@ -153,19 +158,21 @@ export const CommonLocators = {
   "KTM OFFICE": '//android.view.ViewGroup[@content-desc="العمل, KTM OFFICE"]/android.view.View',
   "Choose this location": '//android.widget.TextView[@text="Choose this location"]',
   "receipt number": '//android.widget.EditText[@content-desc="receipt number"]',
-
-  "View All": [
-    '//android.view.ViewGroup[@content-desc="View All"]',
-    '//android.widget.TextView[@text="View All"]',
-    'android=new UiSelector().textMatches("(?i)view all")',
-    'android=new UiSelector().descriptionMatches("(?i)view all")',
+  "Edit location": [
+    '//android.view.ViewGroup[@content-desc="Home, Virtual force"]/android.view.ViewGroup[2]',
+    '//android.view.ViewGroup[@content-desc="Home, Virtual force edited"]/android.view.ViewGroup[2]/com.horcrux.svg.SvgView/com.horcrux.svg.g/Ca1[1]',
+    '//android.view.ViewGroup[@content-desc="Home, Virtual force"]/android.view.ViewGroup[2]/com.horcrux.svg.SvgView/com.horcrux.svg.g/Ca1[1]',
+    '//android.view.ViewGroup[@content-desc="Home, Virtual force"]/android.view.ViewGroup[2]/com.horcrux.svg.SvgView/com.horcrux.svg.g/*[1]'
   ],
-  "MyListSection": '//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[2]',
-  "myListItem": '(//android.widget.ImageView[contains(@resource-id, "item-list-image")])[1]',
-  "stcPaySubmit": '//android.view.ViewGroup[@content-desc="Pay "]/android.view.ViewGroup/com.horcrux.svg.SvgView/com.horcrux.svg.g/com.horcrux.svg.g/com.horcrux.svg.p',
-  "payWithNewCard": '//android.widget.TextView[contains(@text, "with this card")]',
-  "Order History": '//android.view.ViewGroup[@content-desc="Order History"]/android.view.View',
-  "orderHistoryItem": '(//android.view.ViewGroup[contains(@content-desc, "HOURS AGO")]/android.view.View)[1]',
-  "Account": '//android.view.ViewGroup[@content-desc="Account"]/android.view.View',
-  "accountEmailField": '(//android.widget.EditText[contains(@text, "@")])[1]',
+  "Virtual force card": [
+    '//android.view.ViewGroup[@content-desc="Home, Virtual force edited"]/android.view.View',
+    '//android.widget.TextView[@text="Virtual force"]'
+  ],
+  "Saved building information": '//android.widget.EditText[@text="Virtual force"]',
+  "Save and continue": '//android.widget.TextView[@text="Save and continue"]',
+  "Delete saved location": '//android.widget.TextView[@text="Delete saved location"]',
+  "Save card details": '//android.widget.TextView[@text="Save card details to check out faster everywhere Checkout.com is available"]',
+  "checkout email": '//android.widget.EditText[@resource-id="rm_edit_email_input"]/android.view.View[2]',
+  "Add button": '//android.view.ViewGroup[@resource-id="Add button"]',
+  "Reduce button": '//android.view.ViewGroup[@resource-id="Reduce button"]'
 };

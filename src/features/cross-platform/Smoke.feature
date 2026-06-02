@@ -33,9 +33,11 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Click on "android:id/content" button
     Then Click on "Sign In" button
     Then Click on "Forgot your password?" button
-    Then Enter "532255875" into "5XXXXXXXX" Input
+    Then Enter "505643585" into "5XXXXXXXX" Input
     Then Click on "Reset password" button
     Then Verify that the "Please check your SMS for resetting the password" text is displayed
+    # Then wait for "300" Seconds
+    Then Open the link "https://staging.ordering.albaikcloud.com/users/4896417/password/edit?token=f582a29b1f124e9c87c7646c%E2%80%A6" in mobile browser
 
   @smoke @delivery
   Scenario: Place a delivery order on mobile and verify on web admin panel
@@ -520,4 +522,299 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Scroll down "2" lines
     Then Verify that the "Female" text is displayed
 
+@smoke @EditLocation
+  Scenario: Edit, view, delete saved location
+    Given The Albaik application is launched on physical device
+    Then Verify that the "Skip" text is displayed
+    Then Click on "Skip" button
+    Then Click on "android:id/content" button
+    Then Click on "Sign In" button
+    Then Enter "532255875" into "5XXXXXXXX" Input
+    Then Enter "11223344" as password
+    Then Click on "Sign In" button
+    Then wait for "10" Seconds
+    Then Click on "ChannelPicker" button
+    Then Click on "Delivery" button
+    Then Click on "Choose an address" button
+    Then wait for "5" Seconds
+    Then Swipe left "2" times
+    Then Click on "Edit location" button
+    Then wait for "2" Seconds
+    Then Enter "Virtual force edited" into "Saved building information" Input
+    Then wait for "3" Seconds
+    Then Scroll down "2" lines
+    Then Click on "Save and continue" button
+    Then Click on "ChannelPicker" button
+    Then Click on "Delivery" button
+    Then Click on "Choose an address" button
+    Then wait for "5" Seconds
+    Then Verify that the "Virtual force" text is displayed
+    Then Click on "Virtual force edited" button
+    Then Click on "Choose this location" button
+    Then Click on "ChannelPicker" button
+    Then Click on "Delivery" button
+    Then Click on "Choose an address" button
+    Then wait for "5" Seconds
+    Then Verify that the "Virtual force" text is displayed
+    Then Click on "Edit location" button
+    Then wait for "3" Seconds
+    Then Scroll down "2" lines
+    Then Click on "Delete saved location" button
+    Then Click on "Delete" button
 
+@smoke @EditOrder
+  Scenario: Edit order in 2 minutes timer
+   Given The Albaik application is launched on physical device
+      Then Click on "android:id/button2" button
+      Then Click on "Saudi Arabia" button
+      Then Click on "android:id/button2" button
+      Then Verify that the "Skip" text is displayed
+      Then Click on "Skip" button
+      Then Click on "android:id/content" button
+      Then Click on "Sign In" button
+      Then Enter "532255875" into "5XXXXXXXX" Input
+      Then Enter "11223344" as password
+      Then Click on "Sign In" button
+      Then wait for "10" Seconds
+      Then Click on "ChannelPicker" button
+      Then Click on "Pickup from a restaurant" button
+      Then Click on "Choose a restaurant" button
+      Then Click on "Search manually" button
+      Then Enter "ktm" into "City, Branch" Input
+      Then Hit "Enter" key
+      Then Click on "KTM Test Branch" button
+      Then wait for "20" Seconds
+      Then Click on "Order Here" button
+      Then Scroll down "2" lines
+      Then Click on "Double Espresso" button
+      Then Click on "Add to order" button
+      Then Click on "View Basket" button
+      Then wait for "10" Seconds
+      Then Click on "Confirm Order" button
+      Then wait for "10" Seconds
+      Then Complete dynamic checkout with CVV "123"
+      Then Click on "Pay" button
+      Then wait for "10" Seconds
+      Then Click on "android:id/button2" button
+      Then Click on "Edit order" button 
+      Then Click on "Confirm Edit" button
+      Then wait for "5" Seconds
+      Then Scroll down "2" lines
+      Then Click on "cola" button
+      Then Click on "Update order" button
+      Then Click on "View Basket" button
+      
+@smoke @CancelOrder
+  Scenario: Cancel order in 2 minutes timer
+   Given The Albaik application is launched on physical device
+      Then Click on "android:id/button2" button
+      Then Click on "Saudi Arabia" button
+      Then Click on "android:id/button2" button
+      Then Verify that the "Skip" text is displayed
+      Then Click on "Skip" button
+      Then Click on "android:id/content" button
+      Then Click on "Sign In" button
+      Then Enter "532255875" into "5XXXXXXXX" Input
+      Then Enter "11223344" as password
+      Then Click on "Sign In" button
+      Then wait for "10" Seconds
+      Then Click on "ChannelPicker" button
+      Then Click on "Pickup from a restaurant" button
+      Then Click on "Choose a restaurant" button
+      Then Click on "Search manually" button
+      Then Enter "ktm" into "City, Branch" Input
+      Then Hit "Enter" key
+      Then Click on "KTM Test Branch" button
+      Then wait for "20" Seconds
+      Then Click on "Order Here" button
+      Then Scroll down "2" lines
+      Then Click on "Double Espresso" button
+      Then Click on "Add to order" button
+      Then Click on "View Basket" button
+      Then wait for "10" Seconds
+      Then Click on "Confirm Order" button
+      Then wait for "10" Seconds
+      Then Complete dynamic checkout with CVV "123"
+      Then Click on "Pay" button
+      Then wait for "10" Seconds
+      Then Click on "android:id/button2" button
+      Then Click on "Cancel order" button
+      Then Click on "Confirm cancel order" button
+      Then Click on "Order again" button
+      Then wait for "5" Seconds
+      Then Scroll down "2" lines
+      Then Click on "cola" button
+      Then Click on "Add to order" button
+      Then Click on "View Basket" button
+      Then wait for "10" Seconds
+      
+  @smoke @FailedOrder
+  Scenario: Verify failed order
+      Given The Albaik application is launched on physical device
+      Then Click on "android:id/button2" button
+      Then Click on "Saudi Arabia" button
+      Then Click on "android:id/button2" button
+      Then Verify that the "Skip" text is displayed
+      Then Click on "Skip" button
+      Then Click on "android:id/content" button
+      Then Click on "Sign In" button
+      Then Enter "532255875" into "5XXXXXXXX" Input
+      Then Enter "11223344" as password
+      Then Click on "Sign In" button
+      Then wait for "10" Seconds
+      Then Click on "ChannelPicker" button
+      Then Click on "Pickup from a restaurant" button
+      Then Click on "Choose a restaurant" button
+      Then Click on "Search manually" button
+      Then Enter "ktm" into "City, Branch" Input
+      Then Hit "Enter" key
+      Then Click on "KTM Test Branch" button
+      Then wait for "20" Seconds
+      Then Click on "Order Here" button
+      Then Scroll down "2" lines
+      Then Click on "Double Espresso" button
+      Then Click on "Add to order" button
+      Then Click on "View Basket" button
+      Then wait for "10" Seconds
+      Then Click on "Confirm Order" button
+      Then wait for "10" Seconds
+      Then Complete dynamic checkout with CVV "123"
+      Then wait for "180" Seconds
+      Then Capture and store order id from tracking card "tracking-pickup"
+      Then navigate to the web admin panel
+      Then login to the admin panel
+      Then the restaurant panel is loaded and ready
+      Then wait for "5" seconds in web
+      Then Click on web Button with "/admin/orders"
+      Then wait for "2" seconds in web
+      Then Enter captured order ID into input field "search"
+      Then Hit "Enter" key in web
+      Then Click on the order with captured order ID
+      Then wait for "2" seconds in web
+      Then I scroll down in web
+      Then Click on web Button with "Fail"
+      Then wait for "10" Seconds
+      Then Verify that the "Failed" text is displayed
+
+@smoke @CreateNewCard
+  Scenario: Create and save new card
+      Given The Albaik application is launched on physical device
+      Then Click on "android:id/button2" button
+      Then Click on "Saudi Arabia" button
+      Then Click on "android:id/button2" button
+      Then Verify that the "Skip" text is displayed
+      Then Click on "Skip" button
+      Then Click on "android:id/content" button
+      Then Click on "Sign In" button
+      Then Enter "532255875" into "5XXXXXXXX" Input
+      Then Enter "11223344" as password
+      Then Click on "Sign In" button
+      Then wait for "10" Seconds
+      Then Click on "ChannelPicker" button
+      Then Click on "Pickup from a restaurant" button
+      Then Click on "Choose a restaurant" button
+      Then Click on "Search manually" button
+      Then Enter "ktm" into "City, Branch" Input
+      Then Hit "Enter" key
+      Then Click on "KTM Test Branch" button
+      Then wait for "20" Seconds
+      Then Click on "Order Here" button
+      Then Scroll down "2" lines
+      Then Click on "Double Espresso" button
+      Then Click on "Add to order" button
+      Then Click on "View Basket" button
+      Then wait for "10" Seconds
+      Then Click on "Confirm Order" button
+      Then wait for "10" Seconds
+      Then Complete dynamic checkout with CVV "123"
+      Then Click on "Save card details" button
+      Then Enter "testautomation@kualitatem.com" into "checkout email" Input
+
+   @smoke @RefundOrder
+  Scenario: Verify Refund order
+      Given The Albaik application is launched on physical device
+      Then Click on "android:id/button2" button
+      Then Click on "Saudi Arabia" button
+      Then Click on "android:id/button2" button
+      Then Verify that the "Skip" text is displayed
+      Then Click on "Skip" button
+      Then Click on "android:id/content" button
+      Then Click on "Sign In" button
+      Then Enter "532255875" into "5XXXXXXXX" Input
+      Then Enter "11223344" as password
+      Then Click on "Sign In" button
+      Then wait for "10" Seconds
+      Then Click on "ChannelPicker" button
+      Then Click on "Pickup from a restaurant" button
+      Then Click on "Choose a restaurant" button
+      Then Click on "Search manually" button
+      Then Enter "ktm" into "City, Branch" Input
+      Then Hit "Enter" key
+      Then Click on "KTM Test Branch" button
+      Then wait for "20" Seconds
+      Then Click on "Order Here" button
+      Then Scroll down "2" lines
+      Then Click on "Double Espresso" button
+      Then Click on "Add to order" button
+      Then Click on "View Basket" button
+      Then wait for "10" Seconds
+      Then Click on "Confirm Order" button
+      Then wait for "10" Seconds
+      Then Complete dynamic checkout with CVV "123"
+      Then Click on "android:id/button2" button
+      Then wait for "180" Seconds
+      Then Capture and store order id from tracking card "tracking-pickup"
+      Then navigate to the web admin panel
+      Then login to the admin panel
+      Then the restaurant panel is loaded and ready
+      Then wait for "5" seconds in web
+      Then Click on web Button with "/admin/orders"
+      Then wait for "2" seconds in web
+      Then Enter captured order ID into input field "search"
+      Then Hit "Enter" key in web
+      Then Click on the order with captured order ID
+      Then wait for "2" seconds in web
+      Then I scroll down in web
+      Then Click on web Button with "Refund order"
+      Then wait for "10" Seconds
+      Then Verify that the "refund" text is displayed
+
+@smoke @OrderVariations
+Scenario: Customization and variations of an order
+      Given The Albaik application is launched on physical device
+      Then Click on "android:id/button2" button
+      Then Click on "Saudi Arabia" button
+      Then Click on "android:id/button2" button
+      Then Verify that the "Skip" text is displayed
+      Then Click on "Skip" button
+      Then Click on "android:id/content" button
+      Then Click on "Sign In" button
+      Then Enter "532255875" into "5XXXXXXXX" Input
+      Then Enter "11223344" as password
+      Then Click on "Sign In" button
+      Then wait for "10" Seconds
+      Then Click on "ChannelPicker" button
+      Then Click on "Pickup from a restaurant" button
+      Then Click on "Choose a restaurant" button
+      Then Click on "Search manually" button
+      Then Enter "ktm" into "City, Branch" Input
+      Then Hit "Enter" key
+      Then Click on "KTM Test Branch" button
+      Then wait for "10" Seconds
+      Then Click on "Order Here" button
+      Then wait for "5" Seconds
+      Then Scroll down "1" lines
+      Then Click on "Double Espresso" button
+      Then Click on "Add button" button
+      Then Click on "Add to order" button
+      Then Click on "cola" button
+      Then Click on "Reduce button" button
+      Then Click on "Add to order" button
+      Then Click on "View Basket" button
+      Then wait for "10" Seconds
+      Then I capture the total amount with locator "totalAmountText" and store it as "basketTotal"
+      Then Click on "Confirm Order" button
+      Then wait for "10" Seconds
+      Then I capture the total amount with locator "totalAmountText" and store it as "checkoutTotal"
+      Then I compare both stored amounts "basketTotal" and "checkoutTotal" and pass
+      

@@ -56,3 +56,7 @@ Then(/^Verify that the order details page is displayed with correct order ID$/, 
 Then(/^accept web alert$/, async () => {
     await commonWebPage.accept_web_alert();
 });
+
+Then(/^I scroll down in web$/, async () => {
+    await commonWebPage.scroll_down_web();
+});

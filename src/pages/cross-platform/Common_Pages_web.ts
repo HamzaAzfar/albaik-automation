@@ -13,7 +13,13 @@ export class CommonWebPage {
         } catch (e) {}
         await this.webDriver.url(testData.web.baseUrl);
     }
-
+async scroll_down_web() {
+    // Scrolls the web page down by 500 pixels. Adjust the 500 value if you need to scroll further!
+    await browser.execute(() => {
+        window.scrollBy(0, 500);
+    });
+  }
+  
     async loginToAdmin() {
         await this.webDriver.$(CommonLocators.emailInput).waitForDisplayed({ timeout: 10000 });
         await this.webDriver.$(CommonLocators.emailInput).setValue(testData.web.email);
