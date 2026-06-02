@@ -21,7 +21,7 @@ export const CommonLocators = {
   ],
 
   chooseRestaurantButton:
-    'android=new UiSelector().textMatches("(?i).*choose.*restraunt.*|.*choose.*restaurant.*")',
+    'android=new UiSelector().textMatches("(?i).*choose.*restaurant.*")',
 
   searchManuallyButton:
     'android=new UiSelector().textMatches("(?i).*search.*manually.*")',

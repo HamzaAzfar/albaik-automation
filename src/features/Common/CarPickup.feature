@@ -1,7 +1,7 @@
 Feature: Car Pickup - Cross-Platform End-to-End Test
 
-@Carpickup
-  Scenario: Place a Car pickup order on mobile an Vverify on web admin panel
+@CarPickup
+  Scenario: Place a Car pickup order on mobile and verify on web admin panel
       Given The Albaik application is launched on physical device
       Then Click on "android:id/button2" button
       Then Click on "Saudi Arabia" button

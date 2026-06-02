@@ -1,6 +1,6 @@
 import { CommonLocators } from '../../locators/Common/CommonLocator';
 import { BasePage } from '../../common/mobile/BasePage';
-import { testData } from '../../data/Common/testData';
+import { TestData } from '../../data/Common/TestData';
 
 export class CommonFunctionPage extends BasePage {
 
@@ -384,7 +384,7 @@ export class CommonFunctionPage extends BasePage {
   }
 
   async enter_password(password?: string) {
-    const text = password || testData.mobile.password;
+    const text = password || TestData.mobile.password;
     const element = await this.browserInstance.$(CommonLocators.passwordInput);
     await element.waitForDisplayed({ timeout: CommonFunctionPage.DEFAULT_WAIT });
     await element.setValue(text);
@@ -603,31 +603,6 @@ export class CommonFunctionPage extends BasePage {
     }
     
     await driver.pause(3000);
-  }
-
-  async waitForUserInputWithTimeout(seconds: number) {
-    console.log(`\n${'='.repeat(80)}`);
-    console.log(`⏳ PAUSE: You have ${seconds} seconds to copy and paste the new password reset link from SMS`);
-    console.log(`📋 You can press Ctrl+C to interrupt waiting or just wait for the timer to complete`);
-    console.log(`⏱️  Timer started... (${seconds} seconds)`);
-    console.log(`${'='.repeat(80)}\n`);
-    
-    const startTime = Date.now();
-    const totalMs = seconds * 1000;
-    
-    // Wait with periodic logging every 10 seconds
-    while (Date.now() - startTime < totalMs) {
-      const elapsed = Math.floor((Date.now() - startTime) / 1000);
-      const remaining = seconds - elapsed;
-      
-      if (remaining % 10 === 0 && remaining > 0) {
-        console.log(`⏱️  ${remaining} seconds remaining...`);
-      }
-      
-      await this.browserInstance.pause(1000); // Check every 1 second
-    }
-    
-    console.log(`\n✅ ${seconds} seconds completed. Continuing to next step...\n`);
   }
 
   async click_web_link(link: string) {

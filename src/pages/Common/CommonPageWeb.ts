@@ -1,4 +1,4 @@
-import { testData } from '../../data/Common/testData';
+import { TestData } from '../../data/Common/TestData';
 import { CommonLocators } from '../../locators/Common/CommonLocator';
 
 export class CommonWebPage {
@@ -11,7 +11,7 @@ export class CommonWebPage {
         try {
             await this.webDriver.maximizeWindow();
         } catch (e) {}
-        await this.webDriver.url(testData.web.baseUrl);
+        await this.webDriver.url(TestData.web.baseUrl);
     }
 async scroll_down_web() {
     // Scrolls the web page down by 500 pixels. Adjust the 500 value if you need to scroll further!
@@ -22,9 +22,9 @@ async scroll_down_web() {
   
     async loginToAdmin() {
         await this.webDriver.$(CommonLocators.emailInput).waitForDisplayed({ timeout: 10000 });
-        await this.webDriver.$(CommonLocators.emailInput).setValue(testData.web.email);
+        await this.webDriver.$(CommonLocators.emailInput).setValue(TestData.web.email);
         
-        await this.webDriver.$(CommonLocators.webPasswordInput).setValue(testData.web.password);
+        await this.webDriver.$(CommonLocators.webPasswordInput).setValue(TestData.web.password);
         
         await this.webDriver.$(CommonLocators.loginBtn).click();
     }
@@ -39,14 +39,14 @@ async scroll_down_web() {
         try {
             await this.webDriver.maximizeWindow();
         } catch (e) {}
-        const url = (testData as any).curbside?.baseUrl || 'https://staging.ordering.albaikcloud.com/curbside_user/branches/539/session/new';
+        const url = (TestData as any).curbside?.baseUrl || 'https://staging.ordering.albaikcloud.com/curbside_user/branches/539/session/new';
         await this.webDriver.url(url);
     }
 
    
     async loginToCurbside() {
-        const phone = (testData as any).curbside?.phone || '536440699';
-        const pass = (testData as any).curbside?.password || 'Kualitatem123';
+        const phone = (TestData as any).curbside?.phone || '536440699';
+        const pass = (TestData as any).curbside?.password || 'Kualitatem123';
         
         const loginField = await this.webDriver.$(CommonLocators.curbsidePhoneInput);
         await loginField.waitForDisplayed({ timeout: 10000 });

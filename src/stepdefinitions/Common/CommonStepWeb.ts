@@ -1,6 +1,6 @@
 import { Then } from '@cucumber/cucumber';
-import { testData } from '../../data/Common/testData';
-import { CommonWebPage } from '../../pages/cross-platform/Common_Pages_web';
+import { TestData } from '../../data/Common/TestData';
+import { CommonWebPage } from '../../pages/Common/CommonPageWeb';
 
 const commonWebPage = new CommonWebPage();
 
