@@ -9,6 +9,7 @@ import fs from 'fs';
 import path from 'path';
 
 import AllureReporter from '@wdio/allure-reporter';
+import cucumberJson from 'wdio-cucumberjs-json-reporter';
 
 import { getCapabilities } from './config/capabilities';
 
@@ -180,6 +181,8 @@ export const config: WebdriverIO.Config = {
   onPrepare: function () {
     const allureResultsPath = path.join(process.cwd(), 'allure-results');
     const allureReportPath = path.join(process.cwd(), 'allure-report');
+    const cucumberJsonPath = path.join(process.cwd(), 'cucumber-json-reports');
+    const cucumberHtmlPath = path.join(process.cwd(), 'cucumber-html-reports');
 
     if (fs.existsSync(allureResultsPath)) {
       fs.rmSync(allureResultsPath, { recursive: true, force: true });
@@ -188,6 +191,26 @@ export const config: WebdriverIO.Config = {
     if (fs.existsSync(allureReportPath)) {
       fs.rmSync(allureReportPath, { recursive: true, force: true });
     }
+    if (fs.existsSync(cucumberJsonPath)) {
+      fs.rmSync(cucumberJsonPath, { recursive: true, force: true });
+    }
+    if (fs.existsSync(cucumberHtmlPath)) {
+      fs.rmSync(cucumberHtmlPath, { recursive: true, force: true });
+    }
+  },
+
+  onComplete: function () {
+    try {
+      execSync('npx ts-node scripts/generate-cucumber-report.ts', { stdio: 'inherit' });
+      console.log('\n✅ Cucumber HTML report ready → cucumber-html-reports/index.html');
+      console.log('   View:  npm run report:cucumber:open\n');
+    } catch (e) {
+      console.error('Could not generate Cucumber HTML report:', e);
+    }
+    
+    // Note for Allure Backup
+    console.log('ℹ️  Allure report auto-generation is disabled (Cucumber is primary).');
+    console.log('   To generate Allure manually as a backup, run: npm run allure:report\n');
   },
 
   bail: 0,
@@ -259,9 +282,32 @@ export const config: WebdriverIO.Config = {
 
     ],
 
+    ['cucumberjs-json', {
+      jsonFolder: 'cucumber-json-reports',
+      language: 'en',
+    }],
+
   ],
 
 
+
+  afterStep: async function (step, scenario, result, context) {
+    if (!result.passed) {
+      try {
+        const screenshot = await browser.takeScreenshot();
+        if (typeof screenshot === 'string') {
+          // Pass the base64 string directly to cucumber JSON
+          cucumberJson.attach(screenshot, 'image/png');
+        } else if (screenshot && typeof screenshot === 'object') {
+          for (const base64Data of Object.values(screenshot)) {
+            cucumberJson.attach(base64Data as string, 'image/png');
+          }
+        }
+      } catch (error) {
+        console.error('Failed to capture Cucumber screenshot:', error);
+      }
+    }
+  },
 
   afterScenario: async function (_world, result) {
 
