@@ -77,6 +77,7 @@ jobs:
           CI: true
           CUSTOMER_UDID: ${{ env.TARGET_UDID }}
           DEVICE_NAME: ${{ env.TARGET_UDID }}
+          UDID: ${{ env.TARGET_UDID }}
         run: |
           if [ -n "$CUCUMBER_TAGS" ]; then
             npm run test:$TEST_PLATFORM -- --cucumberOpts.tagExpression="$CUCUMBER_TAGS"
