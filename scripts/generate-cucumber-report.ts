@@ -1,4 +1,9 @@
 const reporter = require('cucumber-html-reporter');
+const fs = require('fs');
+
+if (!fs.existsSync('cucumber-html-reports')) {
+    fs.mkdirSync('cucumber-html-reports', { recursive: true });
+}
 
 const options = {
     theme: 'bootstrap', // 'bootstrap' theme includes the pie charts and graphs
