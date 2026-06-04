@@ -49,7 +49,9 @@ jobs:
             exit 1
           fi
           # Wake up the screen if it's asleep (KEYCODE_WAKEUP = 224, won't lock if already awake)
-          adb shell input keyevent 224
+          for device in $(adb devices | awk '/\bdevice\b/ {print $1}'); do
+            adb -s $device shell input keyevent 224 || true
+          done
         shell: bash
 
       - name: Execute Automation Test Suite
