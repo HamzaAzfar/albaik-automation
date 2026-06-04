@@ -4,7 +4,9 @@ import { TestData } from '../../data/Common/TestData';
 
 export class CommonFunctionPage extends BasePage {
 
-  private static readonly DEFAULT_WAIT = 60000;
+  public static get DEFAULT_WAIT(): number {
+    return (global as any).isSmokeTest ? 10000 : 60000;
+  }
   private bottomSheetAnchor = CommonLocators.bottomSheetAnchor;
   private storedAmounts: { [key: string]: string } = {};
 
@@ -32,7 +34,12 @@ export class CommonFunctionPage extends BasePage {
     const pkg = process.env.APP_PACKAGE || 'com.albaik.customer.staging';
     try { await this.browserInstance.terminateApp(pkg); } catch {}
     await this.browserInstance.activateApp(pkg);
-    await this.waitForElement(this.bottomSheetAnchor, CommonFunctionPage.DEFAULT_WAIT);
+    
+    try {
+      await this.waitForElement(this.bottomSheetAnchor, 10000);
+    } catch (e) {
+      console.log(`\n[DEBUG] 'Pickup from a restaurant' not found on launch. The app is likely on the 'Skip' or 'Sign In' screen. Proceeding...\n`);
+    }
   }
 
   async launchDriverApplication(): Promise<void> {
@@ -93,6 +100,7 @@ export class CommonFunctionPage extends BasePage {
     const escaped = text.replace(/"/g, '\\"');
     const lower = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     return [
+      `//android.widget.TextView[@text="${escaped}"]`,
       `//*[@text="${escaped}"]`,
       `//*[@content-desc="${escaped}"]`,
       `//*[contains(@text, "${escaped}")]`,
@@ -140,6 +148,27 @@ export class CommonFunctionPage extends BasePage {
     await expect(element).toBeDisplayed();
   }
 
+  async wait_until_txt_displayed(text: string) {
+    console.log(`[Explicit Wait] Waiting until text "${text}" is displayed...`);
+    const predefinedLocator = (CommonLocators as any)[text];
+    
+    if (predefinedLocator) {
+      const selectors = typeof predefinedLocator === 'string' ? [predefinedLocator] : predefinedLocator;
+      const element = await this.findFirstDisplayed(selectors, CommonFunctionPage.DEFAULT_WAIT);
+      if (!element) {
+        throw new Error(`Explicit wait failed: Element "${text}" not displayed on screen within ${CommonFunctionPage.DEFAULT_WAIT}ms`);
+      }
+      return;
+    }
+    const element = await this.findFirstDisplayed(
+      this.buildTextSelectors(text),
+      CommonFunctionPage.DEFAULT_WAIT
+    );
+    if (!element) {
+      throw new Error(`Explicit wait failed: Text "${text}" not displayed on screen within ${CommonFunctionPage.DEFAULT_WAIT}ms`);
+    }
+  }
+
   async click_btn(btn_name: string) {
     const predefinedLocator = (CommonLocators as any)[btn_name];
     if (predefinedLocator) {
@@ -150,11 +179,25 @@ export class CommonFunctionPage extends BasePage {
             } else {
                 await element.waitForDisplayed({ timeout: CommonFunctionPage.DEFAULT_WAIT });
             }
+            if (btn_name === 'Edit order' || btn_name === 'Cancel order' || btn_name === 'Confirm Edit' || btn_name === 'Confirm Order') {
+                await this.browserInstance.pause(1500); // Pause for bottom sheet animation
+                const freshElement = await this.browserInstance.$(predefinedLocator);
+                await freshElement.click();
+                return;
+            }
             await element.click();
             return;
         } else if (Array.isArray(predefinedLocator)) {
             const element = await this.findFirstDisplayed(predefinedLocator, CommonFunctionPage.DEFAULT_WAIT);
             if (element) {
+                if (btn_name === 'Edit order' || btn_name === 'Cancel order' || btn_name === 'Confirm Edit' || btn_name === 'Confirm Order') {
+                    await this.browserInstance.pause(1500); // Pause for bottom sheet animation
+                    const freshElement = await this.findFirstDisplayed(predefinedLocator, 5000);
+                    if (freshElement) {
+                        await freshElement.click();
+                        return;
+                    }
+                }
                 await element.click();
                 return;
             }
@@ -335,6 +378,16 @@ export class CommonFunctionPage extends BasePage {
 
   async enter_text_in_input_field(textToEnter: string, inputName: string) {
     const predefinedLocator = (CommonLocators as any)[inputName];
+        if (inputName === 'OTP' && predefinedLocator) {
+        const element = await this.browserInstance.$(predefinedLocator);
+        await element.waitForDisplayed({ timeout: CommonFunctionPage.DEFAULT_WAIT });
+        await element.click(); // Focus the field
+        for (const char of textToEnter) {
+            await this.browserInstance.keys([char]);
+            await this.browserInstance.pause(1000); // 1-second break between each digit
+        }
+        return;
+    }
     if (predefinedLocator) {
         if (typeof predefinedLocator === 'string') {
             const element = await this.browserInstance.$(predefinedLocator);
@@ -502,9 +555,9 @@ export class CommonFunctionPage extends BasePage {
         // --- OTHER PREVIOUS FLOW ---
         // (Adjust these steps below if your previous flow differs)
         await this.click_btn("Credit / Debit");
-        await this.enter_text_in_input_field("Hamza Azfar", "card_holder_name_input");
+        await this.enter_text_in_input_field("Ramy", "card_holder_name_input");
         await this.enter_text_in_input_field("4440 0000 0990 0010", "card_number_input");
-        await this.enter_text_in_input_field("01/39", "expiry_date_input");
+        await this.enter_text_in_input_field("0139", "expiry_date_input");
         await this.enter_text_in_input_field(cvv, "cvv_input");
         
     }
@@ -649,6 +702,27 @@ export class CommonFunctionPage extends BasePage {
             command: 'am start',
             args: ['-a', 'android.intent.action.VIEW', '-d', link]
         });
+    }
+  }
+
+  async signOutIfSignedIn() {
+    try {
+      console.log("[DEBUG] Checking if user is already signed in...");
+      const signOutSelectors = this.buildTextSelectors("Sign out");
+      const signOutBtn = await this.findFirstDisplayed(signOutSelectors, 5000);
+      
+      if (signOutBtn) {
+        console.log("[DEBUG] 'Sign out' button found. User is signed in. Clicking 'Sign out'...");
+        await signOutBtn.click();
+        await this.wait_for_seconds(3);
+        
+        console.log("[DEBUG] Reopening menu for the subsequent Sign In steps...");
+        await this.click_btn("android:id/content");
+      } else {
+        console.log("[DEBUG] 'Sign out' not found. Assuming user is not signed in.");
+      }
+    } catch (e) {
+      console.log("[DEBUG] Error checking sign out state, proceeding...", e);
     }
   }
 }

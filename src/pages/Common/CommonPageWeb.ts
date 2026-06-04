@@ -67,8 +67,16 @@ async scroll_down_web() {
     async click_web_link_by_href(href: string) {
         const locator = CommonLocators.webLinkByHref(href);
         const element = await this.webDriver.$(locator);
-        await element.waitForDisplayed({ timeout: 15000 });
-        await element.click();
+        await element.waitForExist({ timeout: 15000 });
+        await element.scrollIntoView({ block: 'center' });
+        await element.waitForDisplayed({ timeout: 5000 });
+        await this.webDriver.pause(500); // Give the browser a moment to settle scrolling
+        try {
+            await element.click();
+        } catch (error) {
+            console.log(`[Web] Standard click failed for "${href}", falling back to JS click.`);
+            await this.webDriver.execute((el: any) => el.click(), element);
+        }
     }
 
     async enter_captured_order_id_by_id(id: string) {
@@ -122,5 +130,13 @@ async scroll_down_web() {
         } catch (e) {
             console.log(`[Web] No alert to accept or failed to accept alert: ${e}`);
         }
+    }
+
+    async enter_text_in_input_web(text: string, inputName: string) {
+        const locator = (CommonLocators as any)[inputName] || CommonLocators.webInputById(inputName);
+        const element = await this.webDriver.$(locator);
+        await element.waitForDisplayed({ timeout: 15000 });
+        await element.setValue(text);
+        console.log(`[Web] Entered text "${text}" into "${inputName}"`);
     }
 }

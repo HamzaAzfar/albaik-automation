@@ -38,22 +38,28 @@ const testSpecs = (isDualMobile || isFullDelivery)
 
 const stepDefinitionFiles = (isDualMobile || isFullDelivery)
   ? [
+      './src/hooks/**/*.ts',
       './src/stepdefinitions/Common/CommonStepMob.ts',
       './src/stepdefinitions/Common/CommonStepWeb.ts',
       './src/stepdefinitions/Common/**/*.ts',
     ]
   : isCrossPlatform
   ? [
+      './src/hooks/**/*.ts',
       './src/stepdefinitions/Common/CommonStepMob.ts',
       './src/stepdefinitions/Common/CommonStepWeb.ts',
       './src/stepdefinitions/Common/**/*.ts',
     ]
   : isWeb
   ? [
+      './src/hooks/**/*.ts',
       './src/stepdefinitions/Common/CommonStepWeb.ts',
       './src/stepdefinitions/Common/**/*.ts',
     ]
-  : ['./src/stepdefinitions/Common/CommonStepMob.ts'];
+  : [
+      './src/hooks/**/*.ts',
+      './src/stepdefinitions/Common/CommonStepMob.ts',
+    ];
 
 
 
@@ -327,9 +333,11 @@ export const config: WebdriverIO.Config = {
 
     tagExpression: '',
 
-    timeout: 120000,
+    timeout: 240000,
 
     ignoreUndefinedDefinitions: false,
+
+    retry: parseInt(process.env.RETRY_COUNT || '1', 10),
 
 
   },

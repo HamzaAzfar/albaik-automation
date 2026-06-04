@@ -98,6 +98,7 @@ export const CommonLocators = {
   refreshButton: '//button[@id="refresh"]',
     pageHeading: 'h1',
   moreInfoLink: 'a',
+  
   dynamicTextInput: (text: string) => `//android.widget.EditText[@text="${text}" or @resource-id="${text}"]`,
     // Tracking Card
   trackingCard: (resourceId: string) =>
@@ -120,7 +121,10 @@ export const CommonLocators = {
       'Print Receipt & Start Collecting': "//button[normalize-space()='Print Receipt & Start Collecting']",
       'OK': "//button[normalize-space()='OK']",
       'Prepared': "//button[normalize-space()='Prepared']",
-      'Fail': "//button[normalize-space()='Fail']"
+      'Fail': "//button[normalize-space()='Fail']",
+      'Create Refund': "//input[@name='commit']",
+      'Refund order': "//a[normalize-space()='Refund order']",
+      'Partial': "//label[normalize-space()='Partial']"
     };
     return predefined[href] || `//a[@href="${href}"]`;
   },
@@ -174,5 +178,23 @@ export const CommonLocators = {
   "Save card details": '//android.widget.TextView[@text="Save card details to check out faster everywhere Checkout.com is available"]',
   "checkout email": '//android.widget.EditText[@resource-id="rm_edit_email_input"]/android.view.View[2]',
   "Add button": '//android.view.ViewGroup[@resource-id="Add button"]',
-  "Reduce button": '//android.view.ViewGroup[@resource-id="Reduce button"]'
+  "Reduce button": '//android.view.ViewGroup[@resource-id="Reduce button"]',
+  "Edit order": [
+    '//android.view.ViewGroup[@content-desc="Edit order"]',
+    '//android.widget.TextView[@text="Edit order"]'
+  ],
+  "Cancel order": [
+    '//android.view.ViewGroup[@content-desc="Cancel order"]',
+    '//android.widget.TextView[@text="Cancel order"]'
+  ],
+  "Confirm Edit": [
+    '//android.widget.TextView[@text="Confirm Edit"]',
+    '//android.view.ViewGroup[@content-desc="Confirm Edit"]'
+  ],
+  "Confirm Order": [
+    '//android.view.ViewGroup[@content-desc="Confirm Order"]',
+    '//android.widget.TextView[@text="Confirm Order"]'
+  ],
+  "OTP": '(//android.widget.ScrollView/android.view.ViewGroup/android.widget.EditText[@text="0"])[1]',
+  "refund_amount": "//input[@id='refund_amount']"
 };
