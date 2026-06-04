@@ -1,8 +1,8 @@
 {
     "typescript.tsdk": "node_modules/typescript/lib",
     "cucumberautocomplete.steps": [
-        "src/step_definitions/**/*.ts",
-        "src/step_definitions/**/*.js"
+        "src/stepdefinitions/**/*.ts",
+        "src/stepdefinitions/**/*.ts"
     ],
     "cucumberautocomplete.syncfeatures": "src/features/**/*.feature",
     "cucumberautocomplete.strictGherkinCompletion": false,

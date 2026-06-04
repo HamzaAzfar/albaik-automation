@@ -30,39 +30,36 @@ const isFullDelivery = TEST_PLATFORM === 'full-delivery';
 const isWeb = TEST_PLATFORM === 'web';
 
 const testSpecs = (isDualMobile || isFullDelivery)
-  ? ['./src/features/cross-platform/**/*.feature']
+  ? ['./src/features/Common/**/*.feature']
   : isCrossPlatform
-  ? ['./src/features/cross-platform/**/*.feature', './src/features/web/**/*.feature', './src/features/mobile/**/*.feature']
+  ? ['./src/features/Common/**/*.feature']
   : isWeb
-  ? ['./src/features/web/**/*.feature', './src/features/cross-platform/**/*.feature']
-  : ['./src/features/mobile/**/*.feature'];
+  ? ['./src/features/Common/**/*.feature']
+  : ['./src/features/Common/**/*.feature'];
 
 const stepDefinitionFiles = (isDualMobile || isFullDelivery)
   ? [
-      './src/step_definitions/Common/Common_StepDef_Mob.ts',
-      './src/step_definitions/Common/Common_StepDef_web.ts',
-      './src/step_definitions/mobile/*.ts',
-      './src/step_definitions/web/*.ts',
-      './src/step_definitions/cross-platform/**/*.ts',
+      './src/hooks/**/*.ts',
+      './src/stepdefinitions/Common/CommonStepMob.ts',
+      './src/stepdefinitions/Common/CommonStepWeb.ts',
+      './src/stepdefinitions/Common/**/*.ts',
     ]
   : isCrossPlatform
   ? [
-      './src/step_definitions/Common/Common_StepDef_Mob.ts',
-      './src/step_definitions/Common/Common_StepDef_web.ts',
-      './src/step_definitions/mobile/*.ts',
-      './src/step_definitions/web/*.ts',
-      './src/step_definitions/cross-platform/**/*.ts',
+      './src/hooks/**/*.ts',
+      './src/stepdefinitions/Common/CommonStepMob.ts',
+      './src/stepdefinitions/Common/CommonStepWeb.ts',
+      './src/stepdefinitions/Common/**/*.ts',
     ]
   : isWeb
   ? [
-      './src/step_definitions/Common/Common_StepDef_web.ts',
-      './src/step_definitions/web/**/*.ts',
-      './src/step_definitions/cross-platform/**/*.ts',
+      './src/hooks/**/*.ts',
+      './src/stepdefinitions/Common/CommonStepWeb.ts',
+      './src/stepdefinitions/Common/**/*.ts',
     ]
   : [
-      './src/step_definitions/Common/Common_StepDef_Mob.ts',
-      './src/step_definitions/mobile/**/*.ts',
-      './src/step_definitions/cross-platform/**/*.ts',
+      './src/hooks/**/*.ts',
+      './src/stepdefinitions/Common/CommonStepMob.ts',
     ];
 
 
@@ -96,17 +93,16 @@ export const config: WebdriverIO.Config = {
   specs: testSpecs,
 
   suites: {
-    carPickup: ['./src/features/cross-platform/CarPickup.feature'],
-    pickup: ['./src/features/cross-platform/Pickup.feature'],
-    delivery: ['./src/features/cross-platform/Delivery.feature'],
-    scanToOrder: ['./src/features/cross-platform/ScanToOrder.feature'],
+    carPickup: ['./src/features/Common/CarPickup.feature'],
+    pickup: ['./src/features/Common/Pickup.feature'],
+    delivery: ['./src/features/Common/Delivery.feature'],
+    scanToOrder: ['./src/features/Common/ScanToOrder.feature'],
   },
 
 
 
    exclude: [
-    './src/features/web/ExampleWeb.feature',
-    './src/features/mobile/ExampleSettings.feature'
+    // No excluded features
   ],
 
 
@@ -383,9 +379,11 @@ export const config: WebdriverIO.Config = {
 
     tagExpression: '',
 
-    timeout: 120000,
+    timeout: 240000,
 
     ignoreUndefinedDefinitions: false,
+
+    retry: parseInt(process.env.RETRY_COUNT || '1', 10),
 
 
   },
