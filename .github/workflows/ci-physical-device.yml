@@ -43,14 +43,14 @@ jobs:
 
       - name: Verify and Wake Physical Android Device
         run: |
-          $devices = adb devices | Select-String -Pattern "\sdevice$"
-          if (-not $devices) {
-            Write-Error "CRITICAL: No physical Android device connected or authorized!"
+          devices=$(adb devices | grep -E '\bdevice\b' || true)
+          if [ -z "$devices" ]; then
+            echo "CRITICAL: No physical Android device connected or authorized!"
             exit 1
-          }
+          fi
           # Wake up the screen if it's asleep (KEYCODE_WAKEUP = 224, won't lock if already awake)
           adb shell input keyevent 224
-        shell: powershell
+        shell: bash
 
       - name: Execute Automation Test Suite
         env:
@@ -58,12 +58,12 @@ jobs:
           CUCUMBER_TAGS: ${{ github.event.inputs.cucumber_tags }}
           CI: true
         run: |
-          if ($env:CUCUMBER_TAGS) {
-            npm run test:${env:TEST_PLATFORM} -- --cucumberOpts.tagExpression="$env:CUCUMBER_TAGS"
-          } else {
-            npm run test:${env:TEST_PLATFORM}
-          }
-        shell: powershell
+          if [ -n "$CUCUMBER_TAGS" ]; then
+            npm run test:$TEST_PLATFORM -- --cucumberOpts.tagExpression="$CUCUMBER_TAGS"
+          else
+            npm run test:$TEST_PLATFORM
+          fi
+        shell: bash
 
       - name: Upload Cucumber HTML Report Artifact
         uses: actions/upload-artifact@v4
@@ -77,14 +77,14 @@ jobs:
         id: zip_report
         if: always()
         run: |
-          if (Test-Path "cucumber-html-reports") {
-            Compress-Archive -Path cucumber-html-reports\* -DestinationPath cucumber-html-report.zip -Force
-            echo "report_generated=true" >> $env:GITHUB_OUTPUT
-          } else {
-            Write-Warning "Cucumber reports directory not found. Skipping zip and email."
-            echo "report_generated=false" >> $env:GITHUB_OUTPUT
-          }
-        shell: powershell
+          if [ -d "cucumber-html-reports" ]; then
+            zip -r cucumber-html-report.zip cucumber-html-reports
+            echo "report_generated=true" >> $GITHUB_OUTPUT
+          else
+            echo "WARNING: Cucumber reports directory not found. Skipping zip and email."
+            echo "report_generated=false" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
 
       - name: Send Email Notification with Results
         uses: dawidd6/action-send-mail@v3
