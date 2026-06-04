@@ -41,24 +41,42 @@ jobs:
       - name: Install NPM Dependencies
         run: npm ci
 
-      - name: Verify and Wake Physical Android Device
+      - name: Verify Device or Emulator Availability
+        id: check_device
         run: |
-          devices=$(adb devices | grep -E '\bdevice\b' || true)
-          if [ -z "$devices" ]; then
-            echo "CRITICAL: No physical Android device connected or authorized!"
+          # Find all attached devices that are NOT emulators
+          physical_devices=$(adb devices | grep -w "device" | grep -v "emulator" | awk '{print $1}')
+          # Find all attached devices that ARE emulators
+          emulators=$(adb devices | grep -w "device" | grep "emulator" | awk '{print $1}')
+          
+          TARGET_UDID=""
+          
+          if [ -n "$physical_devices" ]; then
+            TARGET_UDID=$(echo "$physical_devices" | head -n 1)
+            echo "Found Physical Device: $TARGET_UDID. Priority set."
+          elif [ -n "$emulators" ]; then
+            TARGET_UDID=$(echo "$emulators" | head -n 1)
+            echo "No physical device found. Falling back to Emulator: $TARGET_UDID."
+          else
+            echo "CRITICAL: No physical Android device OR emulator connected/authorized!"
             exit 1
           fi
-          # Wake up the screen if it's asleep (KEYCODE_WAKEUP = 224, won't lock if already awake)
-          for device in $(adb devices | awk '/\bdevice\b/ {print $1}'); do
-            adb -s $device shell input keyevent 224 || true
-          done
+          
+          # Wake up the selected device
+          echo "Waking device: $TARGET_UDID"
+          adb -s "$TARGET_UDID" shell input keyevent 224 || true
+          
+          # Export to environment for next steps
+          echo "TARGET_UDID=$TARGET_UDID" >> $GITHUB_ENV
         shell: bash
 
       - name: Execute Automation Test Suite
         env:
-          TEST_PLATFORM: ${{ github.event.inputs.test_platform || 'cross-platform' }}
+          TEST_PLATFORM: ${{ github.event.inputs.test_platform || 'mobile' }}
           CUCUMBER_TAGS: ${{ github.event.inputs.cucumber_tags }}
           CI: true
+          CUSTOMER_UDID: ${{ env.TARGET_UDID }}
+          DEVICE_NAME: ${{ env.TARGET_UDID }}
         run: |
           if [ -n "$CUCUMBER_TAGS" ]; then
             npm run test:$TEST_PLATFORM -- --cucumberOpts.tagExpression="$CUCUMBER_TAGS"
