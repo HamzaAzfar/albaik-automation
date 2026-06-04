@@ -1,0 +1,114 @@
+name: Albaik Automation CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "master", "main", "talha-automation", "hamza-automation" ]
+  pull_request:
+    branches: [ "master", "main" ]
+  workflow_dispatch:
+    inputs:
+      test_platform:
+        description: 'Test Platform to Run'
+        required: true
+        default: 'cross-platform'
+        type: choice
+        options:
+          - cross-platform
+          - mobile
+          - web
+          - dual-mobile
+      cucumber_tags:
+        description: 'Optional: Tags to run specific testcases (e.g., @smoke or @delivery)'
+        required: false
+        default: ''
+        type: string
+
+jobs:
+  execute-automation-tests:
+    name: Execute E2E Tests on Physical Device
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install NPM Dependencies
+        run: npm ci
+
+      - name: Verify and Wake Physical Android Device
+        run: |
+          $devices = adb devices | Select-String -Pattern "\sdevice$"
+          if (-not $devices) {
+            Write-Error "CRITICAL: No physical Android device connected or authorized!"
+            exit 1
+          }
+          # Wake up the screen if it's asleep (KEYCODE_WAKEUP = 224, won't lock if already awake)
+          adb shell input keyevent 224
+        shell: powershell
+
+      - name: Execute Automation Test Suite
+        env:
+          TEST_PLATFORM: ${{ github.event.inputs.test_platform || 'cross-platform' }}
+          CUCUMBER_TAGS: ${{ github.event.inputs.cucumber_tags }}
+          CI: true
+        run: |
+          if ($env:CUCUMBER_TAGS) {
+            npm run test:${env:TEST_PLATFORM} -- --cucumberOpts.tagExpression="$env:CUCUMBER_TAGS"
+          } else {
+            npm run test:${env:TEST_PLATFORM}
+          }
+        shell: powershell
+
+      - name: Upload Cucumber HTML Report Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cucumber-html-report
+          path: cucumber-html-reports
+          retention-days: 14
+
+      - name: Zip Cucumber Report for Email
+        id: zip_report
+        if: always()
+        run: |
+          if (Test-Path "cucumber-html-reports") {
+            Compress-Archive -Path cucumber-html-reports\* -DestinationPath cucumber-html-report.zip -Force
+            echo "report_generated=true" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Warning "Cucumber reports directory not found. Skipping zip and email."
+            echo "report_generated=false" >> $env:GITHUB_OUTPUT
+          }
+        shell: powershell
+
+      - name: Send Email Notification with Results
+        uses: dawidd6/action-send-mail@v3
+        if: always() && steps.zip_report.outputs.report_generated == 'true'
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: Automation Test Results - ${{ github.repository }}
+          to: ${{ secrets.RECIPIENT_EMAIL }}
+          cc: ${{ secrets.CC_EMAIL }}
+          from: GitHub Actions Bot
+          body: |
+            Dear Team,
+            
+            The automated test execution has finished running for the latest code changes.
+            
+            A ZIP file containing the detailed HTML execution report is attached to this email. Please download the attached ZIP file, extract it, and open 'index.html' in your browser to view the results.
+            
+            You can also view the GitHub Actions run here:
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            
+            Best Regards,
+            QA Automation Team
+          attachments: cucumber-html-report.zip
