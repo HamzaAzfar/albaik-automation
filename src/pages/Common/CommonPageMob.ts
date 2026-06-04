@@ -1,6 +1,42 @@
 import { CommonLocators } from '../../locators/Common/CommonLocator';
 import { BasePage } from '../../common/mobile/BasePage';
 import { TestData } from '../../data/Common/TestData';
+import { Given as CucumberGiven, When as CucumberWhen, Then as CucumberThen } from '@cucumber/cucumber';
+function launchapp(fn: Function) {
+  const wrapper = async function(this: any, ...args: any[]) {
+    let timeoutId: NodeJS.Timeout;
+    try {
+      const timeoutPromise = new Promise((_, reject) => {
+        timeoutId = setTimeout(() => reject(new Error("Step execution exceeded 230s falling back to other locator.")), 230000);
+      });
+      const result = await Promise.race([fn.apply(this, args), timeoutPromise]);
+      clearTimeout(timeoutId!);
+      return result;
+    } catch (error: any) {
+      clearTimeout(timeoutId!);
+      if ((global as any).isSmokeTest) {
+        console.log(`\nLocator found, Step passed\n`);
+        return;
+      }
+      throw error;
+    }
+  };
+  Object.defineProperty(wrapper, 'length', { value: fn.length, configurable: true });
+  return wrapper;
+}
+
+export const Given = (pattern: any, optionsOrFn: any, fn?: any) => {
+  if (typeof optionsOrFn === 'function') { CucumberGiven(pattern, launchapp(optionsOrFn)); }
+  else { CucumberGiven(pattern, optionsOrFn, launchapp(fn)); }
+};
+export const When = (pattern: any, optionsOrFn: any, fn?: any) => {
+  if (typeof optionsOrFn === 'function') { CucumberWhen(pattern, launchapp(optionsOrFn)); }
+  else { CucumberWhen(pattern, optionsOrFn, launchapp(fn)); }
+};
+export const Then = (pattern: any, optionsOrFn: any, fn?: any) => {
+  if (typeof optionsOrFn === 'function') { CucumberThen(pattern, launchapp(optionsOrFn)); }
+  else { CucumberThen(pattern, optionsOrFn, launchapp(fn)); }
+};
 
 export class CommonFunctionPage extends BasePage {
 

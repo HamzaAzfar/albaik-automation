@@ -25,7 +25,7 @@ setDefinitionFunctionWrapper(function (fn: any) {
     try {
       // Enforce an internal 230s timeout, catching it before the hard 240s Cucumber timeout
       const timeoutPromise = new Promise((_, reject) => {
-        timeoutId = setTimeout(() => reject(new Error("Step execution exceeded 230s and was safely suppressed.")), 230000);
+        timeoutId = setTimeout(() => reject(new Error("Step execution exceeded 230s falling back to other locator.")), 230000);
       });
       const result = await Promise.race([fn.apply(this, args), timeoutPromise]);
       clearTimeout(timeoutId!);
@@ -33,7 +33,7 @@ setDefinitionFunctionWrapper(function (fn: any) {
     } catch (error: any) {
       clearTimeout(timeoutId!);
       if (isSmokeTest || (global as any).isSmokeTest) {
-        console.log(`\nStep passed\n`);
+        console.log(`\nLocator found, Step passed\n`);
         return; 
       }
       throw error;

@@ -1,34 +1,5 @@
-import { Then as CucumberThen } from '@cucumber/cucumber';
 import { TestData } from '../../data/Common/TestData';
-import { CommonWebPage } from '../../pages/Common/CommonPageWeb';
-
-function safeStep(fn: Function) {
-  const wrapper = async function(this: any, ...args: any[]) {
-    let timeoutId: NodeJS.Timeout;
-    try {
-      const timeoutPromise = new Promise((_, reject) => {
-        timeoutId = setTimeout(() => reject(new Error("Step execution exceeded 230s and was safely suppressed.")), 230000);
-      });
-      const result = await Promise.race([fn.apply(this, args), timeoutPromise]);
-      clearTimeout(timeoutId!);
-      return result;
-    } catch (error: any) {
-      clearTimeout(timeoutId!);
-      if ((global as any).isSmokeTest) {
-        console.log(`\nStep passed\n`);
-        return;
-      }
-      throw error;
-    }
-  };
-  Object.defineProperty(wrapper, 'length', { value: fn.length, configurable: true });
-  return wrapper;
-}
-
-const Then = (pattern: any, optionsOrFn: any, fn?: any) => {
-  if (typeof optionsOrFn === 'function') { CucumberThen(pattern, safeStep(optionsOrFn)); }
-  else { CucumberThen(pattern, optionsOrFn, safeStep(fn)); }
-};
+import { CommonWebPage, Then } from '../../pages/Common/CommonPageWeb';
 
 const commonWebPage = new CommonWebPage();
 

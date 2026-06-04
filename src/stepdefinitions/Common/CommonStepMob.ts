@@ -1,41 +1,4 @@
-import { Given as CucumberGiven, When as CucumberWhen, Then as CucumberThen } from '@cucumber/cucumber';
-import {CommonFunctionPage} from '../../pages/Common/CommonPageMob';
-
-function safeStep(fn: Function) {
-  const wrapper = async function(this: any, ...args: any[]) {
-    let timeoutId: NodeJS.Timeout;
-    try {
-      const timeoutPromise = new Promise((_, reject) => {
-        timeoutId = setTimeout(() => reject(new Error("Step execution exceeded 230s and was safely suppressed.")), 230000);
-      });
-      const result = await Promise.race([fn.apply(this, args), timeoutPromise]);
-      clearTimeout(timeoutId!);
-      return result;
-    } catch (error: any) {
-      clearTimeout(timeoutId!);
-      if ((global as any).isSmokeTest) {
-        console.log(`\nStep passed\n`);
-        return;
-      }
-      throw error;
-    }
-  };
-  Object.defineProperty(wrapper, 'length', { value: fn.length, configurable: true });
-  return wrapper;
-}
-
-const Given = (pattern: any, optionsOrFn: any, fn?: any) => {
-  if (typeof optionsOrFn === 'function') { CucumberGiven(pattern, safeStep(optionsOrFn)); }
-  else { CucumberGiven(pattern, optionsOrFn, safeStep(fn)); }
-};
-const When = (pattern: any, optionsOrFn: any, fn?: any) => {
-  if (typeof optionsOrFn === 'function') { CucumberWhen(pattern, safeStep(optionsOrFn)); }
-  else { CucumberWhen(pattern, optionsOrFn, safeStep(fn)); }
-};
-const Then = (pattern: any, optionsOrFn: any, fn?: any) => {
-  if (typeof optionsOrFn === 'function') { CucumberThen(pattern, safeStep(optionsOrFn)); }
-  else { CucumberThen(pattern, optionsOrFn, safeStep(fn)); }
-};
+import {CommonFunctionPage, Then, When, Given} from '../../pages/Common/CommonPageMob';
 
 const commonFunctionPage = new CommonFunctionPage(); 
 
