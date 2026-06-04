@@ -45,9 +45,9 @@ jobs:
         id: check_device
         run: |
           # Find all attached devices that are NOT emulators
-          physical_devices=$(adb devices | grep -w "device" | grep -v "emulator" | awk '{print $1}')
+          physical_devices=$(adb devices | grep -w "device" | grep -v "emulator" | awk '{print $1}' || true)
           # Find all attached devices that ARE emulators
-          emulators=$(adb devices | grep -w "device" | grep "emulator" | awk '{print $1}')
+          emulators=$(adb devices | grep -w "device" | grep "emulator" | awk '{print $1}' || true)
           
           TARGET_UDID=""
           
