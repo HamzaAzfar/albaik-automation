@@ -33,4 +33,12 @@ const options = {
     }
 };
 
-reporter.generate(options);
+try {
+    if (!fs.existsSync('cucumber-json-reports')) {
+        console.warn('cucumber-json-reports directory does not exist. Creating it to avoid ENOENT...');
+        fs.mkdirSync('cucumber-json-reports', { recursive: true });
+    }
+    reporter.generate(options);
+} catch (error) {
+    console.error('WARNING: Could not generate Cucumber HTML report.', error.message);
+}
