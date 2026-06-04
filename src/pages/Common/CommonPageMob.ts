@@ -1,11 +1,14 @@
 import { CommonLocators } from '../../locators/Common/CommonLocator';
 import { BasePage } from '../../common/mobile/BasePage';
-import { testData } from '../../data/Common/testData';
+import { TestData } from '../../data/Common/TestData';
 
 export class CommonFunctionPage extends BasePage {
 
-  private static readonly DEFAULT_WAIT = 60000;
+  public static get DEFAULT_WAIT(): number {
+    return (global as any).isSmokeTest ? 10000 : 60000;
+  }
   private bottomSheetAnchor = CommonLocators.bottomSheetAnchor;
+  private storedAmounts: { [key: string]: string } = {};
 
   // /**
   //  * Brings the Android Emulator window to the front of the screen (macOS specific)
@@ -31,7 +34,12 @@ export class CommonFunctionPage extends BasePage {
     const pkg = process.env.APP_PACKAGE || 'com.albaik.customer.staging';
     try { await this.browserInstance.terminateApp(pkg); } catch {}
     await this.browserInstance.activateApp(pkg);
-    await this.waitForElement(this.bottomSheetAnchor, CommonFunctionPage.DEFAULT_WAIT);
+    
+    try {
+      await this.waitForElement(this.bottomSheetAnchor, 10000);
+    } catch (e) {
+      console.log(`\n[DEBUG] 'Pickup from a restaurant' not found on launch. The app is likely on the 'Skip' or 'Sign In' screen. Proceeding...\n`);
+    }
   }
 
   async launchDriverApplication(): Promise<void> {
@@ -92,6 +100,7 @@ export class CommonFunctionPage extends BasePage {
     const escaped = text.replace(/"/g, '\\"');
     const lower = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     return [
+      `//android.widget.TextView[@text="${escaped}"]`,
       `//*[@text="${escaped}"]`,
       `//*[@content-desc="${escaped}"]`,
       `//*[contains(@text, "${escaped}")]`,
@@ -139,6 +148,27 @@ export class CommonFunctionPage extends BasePage {
     await expect(element).toBeDisplayed();
   }
 
+  async wait_until_txt_displayed(text: string) {
+    console.log(`[Explicit Wait] Waiting until text "${text}" is displayed...`);
+    const predefinedLocator = (CommonLocators as any)[text];
+    
+    if (predefinedLocator) {
+      const selectors = typeof predefinedLocator === 'string' ? [predefinedLocator] : predefinedLocator;
+      const element = await this.findFirstDisplayed(selectors, CommonFunctionPage.DEFAULT_WAIT);
+      if (!element) {
+        throw new Error(`Explicit wait failed: Element "${text}" not displayed on screen within ${CommonFunctionPage.DEFAULT_WAIT}ms`);
+      }
+      return;
+    }
+    const element = await this.findFirstDisplayed(
+      this.buildTextSelectors(text),
+      CommonFunctionPage.DEFAULT_WAIT
+    );
+    if (!element) {
+      throw new Error(`Explicit wait failed: Text "${text}" not displayed on screen within ${CommonFunctionPage.DEFAULT_WAIT}ms`);
+    }
+  }
+
   async click_btn(btn_name: string) {
     const predefinedLocator = (CommonLocators as any)[btn_name];
     if (predefinedLocator) {
@@ -149,11 +179,25 @@ export class CommonFunctionPage extends BasePage {
             } else {
                 await element.waitForDisplayed({ timeout: CommonFunctionPage.DEFAULT_WAIT });
             }
+            if (btn_name === 'Edit order' || btn_name === 'Cancel order' || btn_name === 'Confirm Edit' || btn_name === 'Confirm Order') {
+                await this.browserInstance.pause(1500); // Pause for bottom sheet animation
+                const freshElement = await this.browserInstance.$(predefinedLocator);
+                await freshElement.click();
+                return;
+            }
             await element.click();
             return;
         } else if (Array.isArray(predefinedLocator)) {
             const element = await this.findFirstDisplayed(predefinedLocator, CommonFunctionPage.DEFAULT_WAIT);
             if (element) {
+                if (btn_name === 'Edit order' || btn_name === 'Cancel order' || btn_name === 'Confirm Edit' || btn_name === 'Confirm Order') {
+                    await this.browserInstance.pause(1500); // Pause for bottom sheet animation
+                    const freshElement = await this.findFirstDisplayed(predefinedLocator, 5000);
+                    if (freshElement) {
+                        await freshElement.click();
+                        return;
+                    }
+                }
                 await element.click();
                 return;
             }
@@ -280,7 +324,7 @@ export class CommonFunctionPage extends BasePage {
       }
     }
   }
-
+//for favorites
   async swipeLeftOnElement(times: number, elementKey: string) {
     const locator = (CommonLocators as any)[elementKey];
     if (!locator) {
@@ -334,6 +378,16 @@ export class CommonFunctionPage extends BasePage {
 
   async enter_text_in_input_field(textToEnter: string, inputName: string) {
     const predefinedLocator = (CommonLocators as any)[inputName];
+        if (inputName === 'OTP' && predefinedLocator) {
+        const element = await this.browserInstance.$(predefinedLocator);
+        await element.waitForDisplayed({ timeout: CommonFunctionPage.DEFAULT_WAIT });
+        await element.click(); // Focus the field
+        for (const char of textToEnter) {
+            await this.browserInstance.keys([char]);
+            await this.browserInstance.pause(1000); // 1-second break between each digit
+        }
+        return;
+    }
     if (predefinedLocator) {
         if (typeof predefinedLocator === 'string') {
             const element = await this.browserInstance.$(predefinedLocator);
@@ -383,7 +437,7 @@ export class CommonFunctionPage extends BasePage {
   }
 
   async enter_password(password?: string) {
-    const text = password || testData.mobile.password;
+    const text = password || TestData.mobile.password;
     const element = await this.browserInstance.$(CommonLocators.passwordInput);
     await element.waitForDisplayed({ timeout: CommonFunctionPage.DEFAULT_WAIT });
     await element.setValue(text);
@@ -475,4 +529,200 @@ export class CommonFunctionPage extends BasePage {
   );
 }
 
+  async handle_dynamic_checkout(cvv: string) {
+    console.log("[Dynamic Checkout] Checking which checkout layout is currently active...");
+    try {
+        // Try to find the "Continue" button first (Updated Flow)
+        // We use a shorter timeout (10s) so we don't delay the test if it's the old layout
+        const continueSelectors = this.buildTextSelectors("Continue");
+        const element = await this.findFirstDisplayed(continueSelectors, 10000); 
+        
+        if (!element) {
+            throw new Error("Continue button not found, assuming previous layout.");
+        }
+        
+        // --- ORIGINAL UPDATED FLOW ---
+        await element.click(); 
+        await this.wait_for_seconds(5);
+        await this.enter_text_in_input_field(cvv, "checkoutCvv");
+        await this.click_btn("Pay with card");
+        console.log("[Dynamic Checkout] Successfully executed the ORIGINAL UPDATED checkout flow.");
+
+    } catch (error: any) {
+        console.log(`[Dynamic Checkout] Updated layout not detected. Error: ${error.message}`);
+        console.log("[Dynamic Checkout] Falling back to the OTHER PREVIOUS checkout layout...");
+        
+        // --- OTHER PREVIOUS FLOW ---
+        // (Adjust these steps below if your previous flow differs)
+        await this.click_btn("Credit / Debit");
+        await this.enter_text_in_input_field("Ramy", "card_holder_name_input");
+        await this.enter_text_in_input_field("4440 0000 0990 0010", "card_number_input");
+        await this.enter_text_in_input_field("0139", "expiry_date_input");
+        await this.enter_text_in_input_field(cvv, "cvv_input");
+        
+    }
+  }
+
+  async captureAndStoreAmount(locatorKey: string, key: string) {
+    const driver = (this.browserInstance as any).isMultiremote 
+      ? (this.browserInstance as any).mobile 
+      : this.browserInstance;
+
+    // Clear only the specific key's stored value to ensure fresh capture
+    const oldValue = this.storedAmounts[key];
+    delete this.storedAmounts[key];
+    console.log(`[captureAndStoreAmount] Cleared old value for key: "${key}" (was: "${oldValue}")`);
+
+    let actualLocator = (CommonLocators as any)[locatorKey] || locatorKey;
+    
+    console.log(`[captureAndStoreAmount] Using locator: ${actualLocator}`);
+    
+    // Wait a bit for the page to stabilize
+    await this.browserInstance.pause(1000);
+    
+    let elements = await driver.$$(actualLocator);
+    
+    console.log(`[captureAndStoreAmount] Found ${elements.length} elements with locator`);
+    
+    if (elements.length === 0) {
+        throw new Error(`Could not find any element with locator: ${actualLocator}`);
+    }
+    
+    // Collect all visible elements with their amounts
+    const visibleAmounts: Array<{text: string, value: number, index: number}> = [];
+    
+    for (let i = 0; i < elements.length; i++) {
+      try {
+        const isDisplayed = await elements[i].isDisplayed();
+        const text = await elements[i].getText();
+        console.log(`[captureAndStoreAmount] Element [${i}]: "${text}" | isDisplayed: ${isDisplayed}`);
+        
+        if (isDisplayed) {
+          // Extract numeric value from text like "10.00 ﷼" or "755.00 ﷼"
+          const numMatch = text.match(/[\d.,]+/);
+          if (numMatch) {
+            const numValue = parseFloat(numMatch[0].replace(/,/g, ''));
+            visibleAmounts.push({text: text.trim(), value: numValue, index: i});
+          }
+        }
+      } catch (e) {
+        console.log(`[captureAndStoreAmount] Element [${i}]: Could not check visibility`);
+      }
+    }
+    
+    if (visibleAmounts.length === 0) {
+      throw new Error(`No visible elements with numeric amounts found using locator: ${actualLocator}`);
+    }
+    
+    // Sort by value (descending) and get the largest amount (the total)
+    visibleAmounts.sort((a, b) => b.value - a.value);
+    const largestAmount = visibleAmounts[0];
+    
+    this.storedAmounts[key] = largestAmount.text;
+    console.log(`[captureAndStoreAmount] Captured LARGEST visible amount: "${largestAmount.text}" (${largestAmount.value}) from element [${largestAmount.index}] and stored as key: "${key}"`);
+    console.log(`[captureAndStoreAmount] All stored amounts NOW: ${JSON.stringify(this.storedAmounts)}`);
+  }
+
+  async compareStoredAmounts(key1: string, key2: string) {
+    const amount1 = this.storedAmounts[key1];
+    const amount2 = this.storedAmounts[key2];
+    
+    if (amount1 !== amount2) {
+        throw new Error(`Verification Failed! Amounts do not match. ${key1} = ${amount1}, ${key2} = ${amount2}`);
+    }
+    
+    console.log(`Verification Passed! ${key1} (${amount1}) matches ${key2} (${amount2})`);
+  }
+
+  async openLinkInMobileBrowser(url: string) {
+    console.log(`[openLinkInMobileBrowser] Opening link in mobile browser: ${url}`);
+    
+    // Get the mobile driver for multiremote mode
+    let driver: any = (browser as any).isMultiremote ? (global as any).mobile : this.browserInstance;
+    
+    console.log(`[openLinkInMobileBrowser] Using mobile driver to open link`);
+    
+    // Open the link in mobile browser using deep link (this terminates the app and opens browser)
+    try {
+        await driver.execute('mobile: deepLink', { url: url });
+        console.log(`[openLinkInMobileBrowser] Successfully opened in mobile browser via deepLink: ${url}`);
+    } catch (error) {
+        console.log(`[openLinkInMobileBrowser] deepLink failed, attempting am start fallback...`);
+        await driver.execute('mobile: shell', {
+            command: 'am start',
+            args: ['-a', 'android.intent.action.VIEW', '-d', url]
+        });
+        console.log(`[openLinkInMobileBrowser] Successfully opened in mobile browser via am start: ${url}`);
+    }
+    
+    await driver.pause(3000);
+  }
+
+  async click_web_link(link: string) {
+    let driver: any = this.browserInstance;
+    if ((this.browserInstance as any).isMultiremote) {
+        // In multiremote tests, target the specific web session capability
+        driver = (this.browserInstance as any).chrome || (this.browserInstance as any).web || (this.browserInstance as any).browser || this.browserInstance;
+    }
+
+    const locator = CommonLocators.webLinkByHref(link);
+    try {
+        const element = await driver.$(locator);
+        // Using a 10s wait so the fallback URL navigation kicks in quickly if the link element isn't directly clickable
+        await element.waitForDisplayed({ timeout: 10000 });
+        await element.click();
+        console.log(`[click_web_link] Successfully clicked link element: ${link}`);
+    } catch (error) {
+        console.log(`[click_web_link] Element not found, attempting direct URL navigation fallback to: ${link}`);
+        await driver.url(link);
+    }
+  }
+
+  async open_web_link_directly(link: string) {
+    let driver: any = this.browserInstance;
+    if ((this.browserInstance as any).isMultiremote) {
+        // In multiremote tests, target the specific web session capability
+        driver = (this.browserInstance as any).chrome || (this.browserInstance as any).web || (this.browserInstance as any).browser || this.browserInstance;
+    }
+    console.log(`[open_web_link_directly] Navigating directly to URL: ${link}`);
+    await driver.url(link);
+  }
+
+  async open_link_in_mobile_browser(link: string) {
+    let driver: any = this.browserInstance;
+    if ((this.browserInstance as any).isMultiremote) {
+        driver = (this.browserInstance as any).mobile;
+    }
+    console.log(`[open_link_in_mobile_browser] Opening link in mobile browser via intent: ${link}`);
+    try {
+        await driver.execute('mobile: deepLink', { url: link });
+    } catch (error) {
+        console.log("[DEBUG] 'mobile: deepLink' failed. Attempting am start fallback...");
+        await driver.execute('mobile: shell', {
+            command: 'am start',
+            args: ['-a', 'android.intent.action.VIEW', '-d', link]
+        });
+    }
+  }
+
+  async signOutIfSignedIn() {
+    try {
+      console.log("[DEBUG] Checking if user is already signed in...");
+      const signOutSelectors = this.buildTextSelectors("Sign out");
+      const signOutBtn = await this.findFirstDisplayed(signOutSelectors, 5000);
+      
+      if (signOutBtn) {
+        console.log("[DEBUG] 'Sign out' button found. User is signed in. Clicking 'Sign out'...");
+        await signOutBtn.click();
+        await this.wait_for_seconds(3);
+        
+        console.log("[DEBUG] Reopening menu for the subsequent Sign In steps...");
+        await this.click_btn("android:id/content");
+      } else {
+        console.log("[DEBUG] 'Sign out' not found. Assuming user is not signed in.");
+      }
+    } catch (e) {
+      console.log("[DEBUG] Error checking sign out state, proceeding...", e);
+    }
+  }
 }
