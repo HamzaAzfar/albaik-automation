@@ -1,14 +1,8 @@
-/**
- * Cross-Platform Test Data
- * Centralized test data for web portal and mobile app
- */
-
-
 export const qrCodeUrls: { [key: string]: string } = {
   // Change the key here to match your Feature File
   'KTM_BRANCH': 'albaik://store/539',
 };
-export const testData = {
+export const TestData = {
   web: {
     baseUrl: 'https://staging.ordering.albaikcloud.com/sign_in',
     email: 'jane.doe@albaik.com',
@@ -35,4 +29,4 @@ export const orders = {
   },
 };
 
-export default testData;
+export default TestData;
