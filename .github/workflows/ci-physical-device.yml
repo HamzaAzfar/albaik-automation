@@ -10,7 +10,7 @@ on:
       test_platform:
         description: 'Test Platform to Run'
         required: true
-        default: 'cross-platform'
+        default: 'mobile'
         type: choice
         options:
           - cross-platform
