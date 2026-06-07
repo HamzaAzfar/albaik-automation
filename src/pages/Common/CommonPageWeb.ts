@@ -41,12 +41,10 @@ export class CommonWebPage {
         try {
             await this.webDriver.maximizeWindow();
         } catch (e) {
-            // Ignore error if window cannot be maximized (e.g., headless mode)
         }
         await this.webDriver.url(TestData.web.baseUrl);
     }
 async ScrollDownWeb() {
-    // Scrolls the web page down by 500 pixels. Adjust the 500 value if you need to scroll further!
     await browser.execute(() => {
         window.scrollBy(0, 500);
     });
