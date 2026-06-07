@@ -5,61 +5,61 @@ const commonWebPage = new CommonWebPage();
 
 
 Then(/^navigate to the web admin panel$/, async () => {
-    await commonWebPage.navigateToAdminPanel();
+    await commonWebPage.NavigateToAdminPanel();
 });
 
 Then(/^login to the admin panel$/, async () => {
-    await commonWebPage.loginToAdmin();
+    await commonWebPage.LoginToAdmin();
 });
 
 Then(/^the restaurant panel is loaded and ready$/, async () => {
-    await commonWebPage.waitForRestaurantPanel();
+    await commonWebPage.WaitForRestaurantPanel();
 });
 
 Then(/^navigate to the curbside web panel$/, async () => {
-    await commonWebPage.navigateToCurbsidePanel();
+    await commonWebPage.NavigateToCurbsidePanel();
 });
 
 Then(/^login to the curbside panel$/, async () => {
-    await commonWebPage.loginToCurbside();
+    await commonWebPage.LoginToCurbside();
 });
 
 Then(/^the curbside panel is loaded and ready$/, async () => {
-    await commonWebPage.waitForCurbsidePanel();
+    await commonWebPage.WaitForCurbsidePanel();
 });
 
 Then(/^wait for "(\d+)" seconds in web$/, async (seconds: string) => {
-    await commonWebPage.wait_for_seconds_web(parseInt(seconds));
+    await commonWebPage.WaitForSecondsWeb(parseInt(seconds));
 });
 
 Then(/^Click on web Button with "([^"]*)"$/, async (href: string) => {
-    await commonWebPage.click_web_link_by_href(href);
+    await commonWebPage.ClickWebLinkByHref(href);
 });
 
 Then(/^Enter captured order ID into input field "([^"]*)"$/, async (id: string) => {
-    await commonWebPage.enter_captured_order_id_by_id(id);
+    await commonWebPage.EnterCapturedOrderIdById(id);
 });
 
 Then(/^Hit "Enter" key in web$/, async () => {
-    await commonWebPage.hit_enter_web();
+    await commonWebPage.HitEnterWeb();
 });
 
 Then(/^Click on the order with captured order ID$/, async () => {
-    await commonWebPage.click_captured_order_row();
+    await commonWebPage.ClickCapturedOrderRow();
 });
 
 Then(/^Verify that the order details page is displayed with correct order ID$/, async () => {
-    await commonWebPage.verify_order_details_page();
+    await commonWebPage.VerifyOrderDetailsPage();
 });
 
 Then(/^accept web alert$/, async () => {
-    await commonWebPage.accept_web_alert();
+    await commonWebPage.AcceptWebAlert();
 });
 
 Then(/^I scroll down in web$/, async () => {
-    await commonWebPage.scroll_down_web();
+    await commonWebPage.ScrollDownWeb();
 });
 
 Then(/^Enter "([^"]*)" into "([^"]*)" Input web$/, async (text: string, inputName: string) => {
-    await commonWebPage.enter_text_in_input_web(text, inputName);
+    await commonWebPage.EnterTextInInputWeb(text, inputName);
 });

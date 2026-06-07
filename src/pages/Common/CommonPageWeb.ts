@@ -1,6 +1,7 @@
 import { Then as CucumberThen } from '@cucumber/cucumber';
 import { TestData } from '../../data/Common/TestData';
 import { CommonLocators } from '../../locators/Common/CommonLocator';
+import { DataStore } from '../../services/DataStore';
 
 export function launchapp(fn: Function) {
   const wrapper = async function(this: any, ...args: any[]) {
@@ -14,7 +15,7 @@ export function launchapp(fn: Function) {
       return result;
     } catch (error: any) {
       clearTimeout(timeoutId!);
-      if ((global as any).isSmokeTest) {
+      if (DataStore.get('isSmokeTest')) {
         console.log(`\nLocator found,Step passed\n`);
         return;
       }
@@ -36,46 +37,61 @@ export class CommonWebPage {
     }
 
  
-    async navigateToAdminPanel() {
+    async NavigateToAdminPanel() {
         try {
             await this.webDriver.maximizeWindow();
-        } catch (e) {}
+        } catch (e) {
+            // Ignore error if window cannot be maximized (e.g., headless mode)
+        }
         await this.webDriver.url(TestData.web.baseUrl);
     }
-async scroll_down_web() {
+async ScrollDownWeb() {
     // Scrolls the web page down by 500 pixels. Adjust the 500 value if you need to scroll further!
     await browser.execute(() => {
         window.scrollBy(0, 500);
     });
   }
   
-    async loginToAdmin() {
+    async LoginToAdmin() {
+        const email = process.env.ADMIN_EMAIL || TestData.web?.email;
+        const password = process.env.ADMIN_PASSWORD || TestData.web?.password;
+
+        if (!email || !password) {
+            throw new Error("Admin credentials missing. Please set ADMIN_EMAIL and ADMIN_PASSWORD in your .env file");
+        }
+
         await this.webDriver.$(CommonLocators.emailInput).waitForDisplayed({ timeout: 10000 });
-        await this.webDriver.$(CommonLocators.emailInput).setValue(TestData.web.email);
+        await this.webDriver.$(CommonLocators.emailInput).setValue(email);
         
-        await this.webDriver.$(CommonLocators.webPasswordInput).setValue(TestData.web.password);
+        await this.webDriver.$(CommonLocators.webPasswordInput).setValue(password);
         
         await this.webDriver.$(CommonLocators.loginBtn).click();
     }
 
     
-    async waitForRestaurantPanel() {
+    async WaitForRestaurantPanel() {
         await this.webDriver.pause(5000);
     }
     
     
-    async navigateToCurbsidePanel() {
+    async NavigateToCurbsidePanel() {
         try {
             await this.webDriver.maximizeWindow();
-        } catch (e) {}
+        } catch (e) {
+            // Ignore error if window cannot be maximized (e.g., headless mode)
+        }
         const url = (TestData as any).curbside?.baseUrl || 'https://staging.ordering.albaikcloud.com/curbside_user/branches/539/session/new';
         await this.webDriver.url(url);
     }
 
    
-    async loginToCurbside() {
-        const phone = (TestData as any).curbside?.phone || '536440699';
-        const pass = (TestData as any).curbside?.password || 'Kualitatem123';
+    async LoginToCurbside() {
+        const phone = process.env.CURBSIDE_PHONE || (TestData as any).curbside?.phone;
+        const pass = process.env.CURBSIDE_PASSWORD || (TestData as any).curbside?.password;
+        
+        if (!phone || !pass) {
+            throw new Error("Curbside credentials missing. Please set CURBSIDE_PHONE and CURBSIDE_PASSWORD in your .env file");
+        }
         
         const loginField = await this.webDriver.$(CommonLocators.curbsidePhoneInput);
         await loginField.waitForDisplayed({ timeout: 10000 });
@@ -84,16 +100,16 @@ async scroll_down_web() {
         await this.webDriver.$(CommonLocators.loginBtn).click();
     }
 
-    async waitForCurbsidePanel() {
+    async WaitForCurbsidePanel() {
         await this.webDriver.pause(5000);
     }
 
    
-    async wait_for_seconds_web(seconds: number) {
+    async WaitForSecondsWeb(seconds: number) {
         await this.webDriver.pause(seconds * 1000);
     }
 
-    async click_web_link_by_href(href: string) {
+    async ClickWebLinkByHref(href: string) {
         const locator = CommonLocators.webLinkByHref(href);
         const element = await this.webDriver.$(locator);
         await element.waitForExist({ timeout: 15000 });
@@ -108,12 +124,12 @@ async scroll_down_web() {
         }
     }
 
-    async enter_captured_order_id_by_id(id: string) {
+    async EnterCapturedOrderIdById(id: string) {
         const locator = CommonLocators.webInputById(id);
         const element = await this.webDriver.$(locator);
         await element.waitForDisplayed({ timeout: 15000 });
         
-        const capturedOrderId = (global as any).orderId;
+        const capturedOrderId = DataStore.get('orderId');
         if (!capturedOrderId) {
             throw new Error("Order ID was not captured previously!");
         }
@@ -122,13 +138,13 @@ async scroll_down_web() {
         console.log(`[Web] Entered captured Order ID: ${capturedOrderId}`);
     }
 
-    async hit_enter_web() {
+    async HitEnterWeb() {
         await this.webDriver.keys(['Enter']);
         console.log(`[Web] Hit 'Enter' key`);
     }
 
-    async click_captured_order_row() {
-        const capturedOrderId = (global as any).orderId;
+    async ClickCapturedOrderRow() {
+        const capturedOrderId = DataStore.get('orderId');
         if (!capturedOrderId) {
             throw new Error("Order ID was not captured previously!");
         }
@@ -140,8 +156,8 @@ async scroll_down_web() {
         console.log(`[Web] Clicked on order with ID: ${capturedOrderId}`);
     }
 
-    async verify_order_details_page() {
-        const capturedOrderId = (global as any).orderId;
+    async VerifyOrderDetailsPage() {
+        const capturedOrderId = DataStore.get('orderId');
         if (!capturedOrderId) {
             throw new Error("Order ID was not captured previously!");
         }
@@ -152,7 +168,7 @@ async scroll_down_web() {
         console.log(`[Web] Verified order details page is displayed for Order ID: ${capturedOrderId}`);
     }
 
-    async accept_web_alert() {
+    async AcceptWebAlert() {
         try {
             await this.webDriver.acceptAlert();
             console.log(`[Web] Accepted web alert`);
@@ -161,7 +177,7 @@ async scroll_down_web() {
         }
     }
 
-    async enter_text_in_input_web(text: string, inputName: string) {
+    async EnterTextInInputWeb(text: string, inputName: string) {
         const locator = (CommonLocators as any)[inputName] || CommonLocators.webInputById(inputName);
         const element = await this.webDriver.$(locator);
         await element.waitForDisplayed({ timeout: 15000 });

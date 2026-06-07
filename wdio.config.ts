@@ -204,6 +204,12 @@ export const config: WebdriverIO.Config = {
       execSync('npx ts-node scripts/generate-cucumber-report.ts', { stdio: 'inherit' });
       console.log('\n✅ Cucumber HTML report ready → cucumber-html-reports/index.html');
       console.log('   View:  npm run report:cucumber:open\n');
+
+      if (!process.env.CI) {
+        const isWindows = process.platform === 'win32';
+        const openCmd = isWindows ? 'start' : process.platform === 'darwin' ? 'open' : 'xdg-open';
+        execSync(`${openCmd} cucumber-html-reports/index.html`);
+      }
     } catch (e) {
       console.error('Could not generate Cucumber HTML report:', e);
     }
@@ -260,7 +266,10 @@ export const config: WebdriverIO.Config = {
 
   reporters: [
 
-    ['spec', { realtimeReporting: true }],
+    ['spec', { 
+      realtimeReporting: !(isCrossPlatform || isDualMobile || isFullDelivery),
+      showBrowserCapabilities: false 
+    }],
 
     [
 

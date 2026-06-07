@@ -1,29 +1,21 @@
-class DataStore {
-  private static data: { [key: string]: any } = {};
+export class DataStoreService {
+    private store = new Map<string, any>();
 
-  static set(key: string, value: any): void {
-    this.data[key] = value;
-    console.log(`✓ DataStore: Set ${key} = ${JSON.stringify(value)}`);
-  }
+    set(key: string, value: any): void {
+        this.store.set(key, value);
+    }
 
-  static get(key: string): any {
-    const value = this.data[key];
-    console.log(`✓ DataStore: Get ${key} = ${JSON.stringify(value)}`);
-    return value;
-  }
+    get(key: string): any {
+        return this.store.get(key);
+    }
 
-  static has(key: string): boolean {
-    return key in this.data;
-  }
+    has(key: string): boolean {
+        return this.store.has(key);
+    }
 
-  static clear(): void {
-    this.data = {};
-    console.log('✓ DataStore: Cleared all data');
-  }
-
-  static getAll(): any {
-    return { ...this.data };
-  }
+    clear(): void {
+        this.store.clear();
+    }
 }
 
-export default DataStore;
+export const DataStore = new DataStoreService();

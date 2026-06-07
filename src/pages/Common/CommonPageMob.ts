@@ -1,6 +1,7 @@
 import { CommonLocators } from '../../locators/Common/CommonLocator';
 import { BasePage } from '../../common/mobile/BasePage';
 import { TestData } from '../../data/Common/TestData';
+import { DataStore } from '../../services/DataStore';
 import { Given as CucumberGiven, When as CucumberWhen, Then as CucumberThen } from '@cucumber/cucumber';
 function launchapp(fn: Function) {
   const wrapper = async function(this: any, ...args: any[]) {
@@ -14,7 +15,7 @@ function launchapp(fn: Function) {
       return result;
     } catch (error: any) {
       clearTimeout(timeoutId!);
-      if ((global as any).isSmokeTest) {
+      if (DataStore.get('isSmokeTest')) {
         console.log(`\nLocator found, Step passed\n`);
         return;
       }
@@ -41,52 +42,38 @@ export const Then = (pattern: any, optionsOrFn: any, fn?: any) => {
 export class CommonFunctionPage extends BasePage {
 
   public static get DEFAULT_WAIT(): number {
-    return (global as any).isSmokeTest ? 10000 : 60000;
+    return DataStore.get('isSmokeTest') ? 10000 : 60000;
   }
   private bottomSheetAnchor = CommonLocators.bottomSheetAnchor;
-  private storedAmounts: { [key: string]: string } = {};
 
-  // /**
-  //  * Brings the Android Emulator window to the front of the screen (macOS specific)
-  //  */
-  // private bringEmulatorToFront() {
-  //   if (process.platform === 'darwin') {
-  //       try {
-  //           // macOS usually identifies the Android emulator bundle natively as "Emulator"
-  //           execSync(`osascript -e 'tell application "Emulator" to activate'`);
-  //       } catch (e) {
-  //           try {
-  //               // Fallback: bring any process utilizing "qemu" (the emulator engine) to the front
-  //               execSync(`osascript -e 'tell application "System Events" to set frontmost of every process whose name contains "qemu" to true'`);
-  //           } catch (err) {}
-  //       }
-  //   }
-  // }
 
-  async waitForHomeScreen(): Promise<void> {
-    if (browser.isMultiremote && (global as any).customerApp) {
-      (global as any)._mobileContext = 'customerApp';
+  async WaitForHomeScreen(): Promise<void> {
+    if ((browser as any).isMultiremote && (browser as any).customerApp) {
+      DataStore.set('mobileContext', 'customerApp');
     }
     const pkg = process.env.APP_PACKAGE || 'com.albaik.customer.staging';
-    try { await this.browserInstance.terminateApp(pkg); } catch {}
+    try { 
+      await this.browserInstance.terminateApp(pkg); 
+    } catch (e) {
+    }
     await this.browserInstance.activateApp(pkg);
     
     try {
       await this.waitForElement(this.bottomSheetAnchor, 10000);
     } catch (e) {
-      console.log(`\n[DEBUG] 'Pickup from a restaurant' not found on launch. The app is likely on the 'Skip' or 'Sign In' screen. Proceeding...\n`);
+      console.log(`\n'Pickup from a restaurant' not found on launch\n`);
     }
   }
 
-  async launchDriverApplication(): Promise<void> {
+  async LaunchDriverApplication(): Promise<void> {
     const driverPkg = process.env.DRIVER_APP_PACKAGE || 'com.albaikdriver';
     const driverActivity = process.env.DRIVER_APP_ACTIVITY || 'com.albaikdriver.MainActivity';
 
     let targetDriver: any;
     
-    if (browser.isMultiremote && (global as any).driverApp) {
-      (global as any)._mobileContext = 'driverApp';
-      targetDriver = (global as any).driverApp;
+    if ((browser as any).isMultiremote && (browser as any).driverApp) {
+      DataStore.set('mobileContext', 'driverApp');
+      targetDriver = (browser as any).driverApp;
     } else {
       targetDriver = (this.browserInstance as any).isMultiremote
         ? (this.browserInstance as any).mobile
@@ -118,11 +105,11 @@ export class CommonFunctionPage extends BasePage {
     }
   }
 
-  async closeCustomerApplication(): Promise<void> {
+  async CloseCustomerApplication(): Promise<void> {
     const customerPkg = process.env.APP_PACKAGE || 'com.albaik.customer.staging';
 
-    if (browser.isMultiremote && (global as any).customerApp) {
-      await (global as any).customerApp.terminateApp(customerPkg);
+    if ((browser as any).isMultiremote && (browser as any).customerApp) {
+      await (browser as any).customerApp.terminateApp(customerPkg);
       return;
     }
 
@@ -132,7 +119,7 @@ export class CommonFunctionPage extends BasePage {
     await driver.terminateApp(customerPkg);
   }
 
-  private buildTextSelectors(text: string): string[] {
+  private BuildTextSelectors(text: string): string[] {
     const escaped = text.replace(/"/g, '\\"');
     const lower = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     return [
@@ -146,7 +133,7 @@ export class CommonFunctionPage extends BasePage {
     ];
   }
 
-  private async findFirstDisplayed(selectors: string[], timeout: number): Promise<WebdriverIO.Element | null> {
+  private async FindFirstDisplayed(selectors: string[], timeout: number): Promise<WebdriverIO.Element | null> {
     const deadline = Date.now() + timeout;
     while (Date.now() < deadline) {
       for (const selector of selectors) {
@@ -155,7 +142,7 @@ export class CommonFunctionPage extends BasePage {
           if (await element.isExisting() && await element.isDisplayed()) {
             return element;
           }
-        } catch {
+        } catch (e) {
         }
       }
       await this.browserInstance.pause(500);
@@ -163,19 +150,19 @@ export class CommonFunctionPage extends BasePage {
     return null;
   }
 
-  async verify_txt(text: string) {
+  async VerifyTxt(text: string) {
     const predefinedLocator = (CommonLocators as any)[text];
     if (predefinedLocator) {
       const selectors = typeof predefinedLocator === 'string' ? [predefinedLocator] : predefinedLocator;
-      const element = await this.findFirstDisplayed(selectors, CommonFunctionPage.DEFAULT_WAIT);
+      const element = await this.FindFirstDisplayed(selectors, CommonFunctionPage.DEFAULT_WAIT);
       if (!element) {
         throw new Error(`Element "${text}" not displayed on screen within ${CommonFunctionPage.DEFAULT_WAIT}ms`);
       }
       await expect(element).toBeDisplayed();
       return;
     }
-    const element = await this.findFirstDisplayed(
-      this.buildTextSelectors(text),
+    const element = await this.FindFirstDisplayed(
+      this.BuildTextSelectors(text),
       CommonFunctionPage.DEFAULT_WAIT
     );
     if (!element) {
@@ -184,20 +171,20 @@ export class CommonFunctionPage extends BasePage {
     await expect(element).toBeDisplayed();
   }
 
-  async wait_until_txt_displayed(text: string) {
+  async WaitUntilTxtDisplayed(text: string) {
     console.log(`[Explicit Wait] Waiting until text "${text}" is displayed...`);
     const predefinedLocator = (CommonLocators as any)[text];
     
     if (predefinedLocator) {
       const selectors = typeof predefinedLocator === 'string' ? [predefinedLocator] : predefinedLocator;
-      const element = await this.findFirstDisplayed(selectors, CommonFunctionPage.DEFAULT_WAIT);
+      const element = await this.FindFirstDisplayed(selectors, CommonFunctionPage.DEFAULT_WAIT);
       if (!element) {
         throw new Error(`Explicit wait failed: Element "${text}" not displayed on screen within ${CommonFunctionPage.DEFAULT_WAIT}ms`);
       }
       return;
     }
-    const element = await this.findFirstDisplayed(
-      this.buildTextSelectors(text),
+    const element = await this.FindFirstDisplayed(
+      this.BuildTextSelectors(text),
       CommonFunctionPage.DEFAULT_WAIT
     );
     if (!element) {
@@ -205,7 +192,7 @@ export class CommonFunctionPage extends BasePage {
     }
   }
 
-  async click_btn(btn_name: string) {
+  async ClickBtn(btn_name: string) {
     const predefinedLocator = (CommonLocators as any)[btn_name];
     if (predefinedLocator) {
         if (typeof predefinedLocator === 'string') {
@@ -224,11 +211,11 @@ export class CommonFunctionPage extends BasePage {
             await element.click();
             return;
         } else if (Array.isArray(predefinedLocator)) {
-            const element = await this.findFirstDisplayed(predefinedLocator, CommonFunctionPage.DEFAULT_WAIT);
+            const element = await this.FindFirstDisplayed(predefinedLocator, CommonFunctionPage.DEFAULT_WAIT);
             if (element) {
                 if (btn_name === 'Edit order' || btn_name === 'Cancel order' || btn_name === 'Confirm Edit' || btn_name === 'Confirm Order') {
                     await this.browserInstance.pause(1500); // Pause for bottom sheet animation
-                    const freshElement = await this.findFirstDisplayed(predefinedLocator, 5000);
+                    const freshElement = await this.FindFirstDisplayed(predefinedLocator, 5000);
                     if (freshElement) {
                         await freshElement.click();
                         return;
@@ -248,8 +235,8 @@ export class CommonFunctionPage extends BasePage {
         return;
     }
 
-    const element = await this.findFirstDisplayed(
-      this.buildTextSelectors(btn_name),
+    const element = await this.FindFirstDisplayed(
+      this.BuildTextSelectors(btn_name),
       CommonFunctionPage.DEFAULT_WAIT
     );
     if (!element) {
@@ -258,7 +245,7 @@ export class CommonFunctionPage extends BasePage {
     await element.click();
   }
 
-  async click_profile_icon() {
+  async ClickProfileIcon() {
     const xpath = '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[3]/com.horcrux.svg.SvgView/com.horcrux.svg.g/ya1';
     
     const driver = (this.browserInstance as any).isMultiremote 
@@ -271,11 +258,11 @@ export class CommonFunctionPage extends BasePage {
   }
 
   
-  async wait_for_seconds(seconds: number) {
+  async WaitForSeconds(seconds: number) {
     await this.browserInstance.pause(seconds * 1000);
   }
 
- async scrollDownLines(lines: number) {
+ async ScrollDownLines(lines: number) {
   const { width, height } = await this.browserInstance.getWindowRect();
 
   const startX = Math.floor(width / 2);
@@ -329,7 +316,7 @@ export class CommonFunctionPage extends BasePage {
   }
 }
 
-  async swipeLeft(times: number) {
+  async SwipeLeft(times: number) {
     const { width, height } = await this.browserInstance.getWindowRect();
 
     const startY = Math.floor(height * 0.75);
@@ -361,7 +348,7 @@ export class CommonFunctionPage extends BasePage {
     }
   }
 //for favorites
-  async swipeLeftOnElement(times: number, elementKey: string) {
+  async SwipeLeftOnElement(times: number, elementKey: string) {
     const locator = (CommonLocators as any)[elementKey];
     if (!locator) {
       throw new Error(`Locator "${elementKey}" not found in CommonLocators`);
@@ -408,11 +395,11 @@ export class CommonFunctionPage extends BasePage {
     }
   }
 
-  async write_in_input_field(text: string) {
+  async WriteInInputField(text: string) {
     await this.browserInstance.keys(text);
   }
 
-  async enter_text_in_input_field(textToEnter: string, inputName: string) {
+  async EnterTextInInputField(textToEnter: string, inputName: string) {
     const predefinedLocator = (CommonLocators as any)[inputName];
         if (inputName === 'OTP' && predefinedLocator) {
         const element = await this.browserInstance.$(predefinedLocator);
@@ -431,7 +418,7 @@ export class CommonFunctionPage extends BasePage {
             await element.setValue(textToEnter);
             return;
         } else if (Array.isArray(predefinedLocator)) {
-            const element = await this.findFirstDisplayed(predefinedLocator, CommonFunctionPage.DEFAULT_WAIT);
+            const element = await this.FindFirstDisplayed(predefinedLocator, CommonFunctionPage.DEFAULT_WAIT);
             if (element) {
                 await element.setValue(textToEnter);
                 return;
@@ -449,15 +436,15 @@ export class CommonFunctionPage extends BasePage {
     await element.setValue(textToEnter);
   }
 
-  async enter_captured_order_id_in_input_field(inputName: string) {
-    const capturedOrderId = (global as any).orderId;
+  async EnterCapturedOrderIdInInputField(inputName: string) {
+    const capturedOrderId = DataStore.get('orderId');
     if (!capturedOrderId) {
         throw new Error("Order ID was not captured previously!");
     }
-    await this.enter_text_in_input_field(capturedOrderId, inputName);
+    await this.EnterTextInInputField(capturedOrderId, inputName);
   }
 
-  async hit_key(keyName: string) {
+  async HitKey(keyName: string) {
     if (keyName.toLowerCase() === 'enter') {
       await this.browserInstance.keys(['Enter']);
     } else {
@@ -465,15 +452,19 @@ export class CommonFunctionPage extends BasePage {
     }
   }
 
-  async select_card_ending_with(lastFourDigits: string) {
+  async SelectCardEndingWith(lastFourDigits: string) {
     const locator = CommonLocators.cardEndingWith(lastFourDigits);
     const element = await this.browserInstance.$(locator);
     await element.waitForDisplayed({ timeout: CommonFunctionPage.DEFAULT_WAIT });
     await element.click();
   }
 
-  async enter_password(password?: string) {
-    const text = password || TestData.mobile.password;
+  async EnterPassword(password?: string) {
+    const text = password || process.env.MOBILE_PASSWORD || TestData.mobile?.password;
+    if (!text) {
+        throw new Error("Mobile password missing. Please set MOBILE_PASSWORD in your .env file or pass it to the step.");
+    }
+
     const element = await this.browserInstance.$(CommonLocators.passwordInput);
     await element.waitForDisplayed({ timeout: CommonFunctionPage.DEFAULT_WAIT });
     await element.setValue(text);
@@ -481,7 +472,7 @@ export class CommonFunctionPage extends BasePage {
 
   
     
-    async redirectToBranchViaIntent(branchId: string): Promise<void> {
+    async RedirectToBranchViaIntent(branchId: string): Promise<void> {
         const deepLink = `albaik://store/${branchId}`; // Construct the deep link
         const pkg = process.env.APP_PACKAGE || 'com.albaik.customer.staging'; // Get package from .env or fallback
         const appActivity = process.env.APP_ACTIVITY || '.MainActivity'; // Get main activity from .env
@@ -537,7 +528,7 @@ export class CommonFunctionPage extends BasePage {
 
         await this.browserInstance.pause(4000);
     }
-    async capture_and_store_order_id(
+    async CaptureAndStoreOrderId(
   trackingCardId: string
 ) {
 
@@ -558,20 +549,20 @@ export class CommonFunctionPage extends BasePage {
   const orderId =
     fullText.replace('#', '').trim();
 
-  (global as any).orderId = orderId;
+  DataStore.set('orderId', orderId);
 
   console.log(
-    `Captured Order ID: ${(global as any).orderId}`
+    `Captured Order ID: ${DataStore.get('orderId')}`
   );
 }
 
-  async handle_dynamic_checkout(cvv: string) {
+  async HandleDynamicCheckout(cvv: string) {
     console.log("[Dynamic Checkout] Checking which checkout layout is currently active...");
     try {
         // Try to find the "Continue" button first (Updated Flow)
         // We use a shorter timeout (10s) so we don't delay the test if it's the old layout
-        const continueSelectors = this.buildTextSelectors("Continue");
-        const element = await this.findFirstDisplayed(continueSelectors, 10000); 
+        const continueSelectors = this.BuildTextSelectors("Continue");
+        const element = await this.FindFirstDisplayed(continueSelectors, 10000); 
         
         if (!element) {
             throw new Error("Continue button not found, assuming previous layout.");
@@ -579,9 +570,9 @@ export class CommonFunctionPage extends BasePage {
         
         // --- ORIGINAL UPDATED FLOW ---
         await element.click(); 
-        await this.wait_for_seconds(5);
-        await this.enter_text_in_input_field(cvv, "checkoutCvv");
-        await this.click_btn("Pay with card");
+        await this.WaitForSeconds(5);
+        await this.EnterTextInInputField(cvv, "checkoutCvv");
+        await this.ClickBtn("Pay with card");
         console.log("[Dynamic Checkout] Successfully executed the ORIGINAL UPDATED checkout flow.");
 
     } catch (error: any) {
@@ -590,23 +581,31 @@ export class CommonFunctionPage extends BasePage {
         
         // --- OTHER PREVIOUS FLOW ---
         // (Adjust these steps below if your previous flow differs)
-        await this.click_btn("Credit / Debit");
-        await this.enter_text_in_input_field("Ramy", "card_holder_name_input");
-        await this.enter_text_in_input_field("4440 0000 0990 0010", "card_number_input");
-        await this.enter_text_in_input_field("0139", "expiry_date_input");
-        await this.enter_text_in_input_field(cvv, "cvv_input");
+        const cardName = process.env.TEST_CARD_NAME || (TestData as any).card?.name;
+        const cardNumber = process.env.TEST_CARD_NUMBER || (TestData as any).card?.number;
+        const cardExpiry = process.env.TEST_CARD_EXPIRY || (TestData as any).card?.expiry;
+
+        if (!cardName || !cardNumber || !cardExpiry) {
+            throw new Error("Test card details missing. Please set TEST_CARD_NAME, TEST_CARD_NUMBER, and TEST_CARD_EXPIRY in your .env file");
+        }
+
+        await this.ClickBtn("Credit / Debit");
+        await this.EnterTextInInputField(cardName, "card_holder_name_input");
+        await this.EnterTextInInputField(cardNumber, "card_number_input");
+        await this.EnterTextInInputField(cardExpiry, "expiry_date_input");
+        await this.EnterTextInInputField(cvv, "cvv_input");
         
     }
   }
 
-  async captureAndStoreAmount(locatorKey: string, key: string) {
+  async CaptureAndStoreAmount(locatorKey: string, key: string) {
     const driver = (this.browserInstance as any).isMultiremote 
       ? (this.browserInstance as any).mobile 
       : this.browserInstance;
 
     // Clear only the specific key's stored value to ensure fresh capture
-    const oldValue = this.storedAmounts[key];
-    delete this.storedAmounts[key];
+    const oldValue = DataStore.get(key);
+    DataStore.set(key, undefined);
     console.log(`[captureAndStoreAmount] Cleared old value for key: "${key}" (was: "${oldValue}")`);
 
     let actualLocator = (CommonLocators as any)[locatorKey] || locatorKey;
@@ -654,14 +653,13 @@ export class CommonFunctionPage extends BasePage {
     visibleAmounts.sort((a, b) => b.value - a.value);
     const largestAmount = visibleAmounts[0];
     
-    this.storedAmounts[key] = largestAmount.text;
+    DataStore.set(key, largestAmount.text);
     console.log(`[captureAndStoreAmount] Captured LARGEST visible amount: "${largestAmount.text}" (${largestAmount.value}) from element [${largestAmount.index}] and stored as key: "${key}"`);
-    console.log(`[captureAndStoreAmount] All stored amounts NOW: ${JSON.stringify(this.storedAmounts)}`);
   }
 
-  async compareStoredAmounts(key1: string, key2: string) {
-    const amount1 = this.storedAmounts[key1];
-    const amount2 = this.storedAmounts[key2];
+  async CompareStoredAmounts(key1: string, key2: string) {
+    const amount1 = DataStore.get(key1);
+    const amount2 = DataStore.get(key2);
     
     if (amount1 !== amount2) {
         throw new Error(`Verification Failed! Amounts do not match. ${key1} = ${amount1}, ${key2} = ${amount2}`);
@@ -670,11 +668,11 @@ export class CommonFunctionPage extends BasePage {
     console.log(`Verification Passed! ${key1} (${amount1}) matches ${key2} (${amount2})`);
   }
 
-  async openLinkInMobileBrowser(url: string) {
+  async OpenLinkInMobileBrowser(url: string) {
     console.log(`[openLinkInMobileBrowser] Opening link in mobile browser: ${url}`);
     
     // Get the mobile driver for multiremote mode
-    let driver: any = (browser as any).isMultiremote ? (global as any).mobile : this.browserInstance;
+    let driver: any = (browser as any).isMultiremote ? (browser as any).mobile : this.browserInstance;
     
     console.log(`[openLinkInMobileBrowser] Using mobile driver to open link`);
     
@@ -694,7 +692,7 @@ export class CommonFunctionPage extends BasePage {
     await driver.pause(3000);
   }
 
-  async click_web_link(link: string) {
+  async ClickWebLink(link: string) {
     let driver: any = this.browserInstance;
     if ((this.browserInstance as any).isMultiremote) {
         // In multiremote tests, target the specific web session capability
@@ -714,7 +712,7 @@ export class CommonFunctionPage extends BasePage {
     }
   }
 
-  async open_web_link_directly(link: string) {
+  async OpenWebLinkDirectly(link: string) {
     let driver: any = this.browserInstance;
     if ((this.browserInstance as any).isMultiremote) {
         // In multiremote tests, target the specific web session capability
@@ -724,36 +722,19 @@ export class CommonFunctionPage extends BasePage {
     await driver.url(link);
   }
 
-  async open_link_in_mobile_browser(link: string) {
-    let driver: any = this.browserInstance;
-    if ((this.browserInstance as any).isMultiremote) {
-        driver = (this.browserInstance as any).mobile;
-    }
-    console.log(`[open_link_in_mobile_browser] Opening link in mobile browser via intent: ${link}`);
-    try {
-        await driver.execute('mobile: deepLink', { url: link });
-    } catch (error) {
-        console.log("[DEBUG] 'mobile: deepLink' failed. Attempting am start fallback...");
-        await driver.execute('mobile: shell', {
-            command: 'am start',
-            args: ['-a', 'android.intent.action.VIEW', '-d', link]
-        });
-    }
-  }
-
-  async signOutIfSignedIn() {
+  async SignOutIfSignedIn() {
     try {
       console.log("[DEBUG] Checking if user is already signed in...");
-      const signOutSelectors = this.buildTextSelectors("Sign out");
-      const signOutBtn = await this.findFirstDisplayed(signOutSelectors, 5000);
+      const signOutSelectors = this.BuildTextSelectors("Sign out");
+      const signOutBtn = await this.FindFirstDisplayed(signOutSelectors, 5000);
       
       if (signOutBtn) {
         console.log("[DEBUG] 'Sign out' button found. User is signed in. Clicking 'Sign out'...");
         await signOutBtn.click();
-        await this.wait_for_seconds(3);
+        await this.WaitForSeconds(3);
         
         console.log("[DEBUG] Reopening menu for the subsequent Sign In steps...");
-        await this.click_btn("android:id/content");
+        await this.ClickBtn("android:id/content");
       } else {
         console.log("[DEBUG] 'Sign out' not found. Assuming user is not signed in.");
       }

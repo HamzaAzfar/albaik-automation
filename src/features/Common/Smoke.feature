@@ -1,6 +1,6 @@
 Feature: Smoke Tests - Cross-Platform End-to-End
 
-  @smoke @login
+  @smoke1 @login
   Scenario: Login to the customer app
     Given The Albaik application is launched on physical device
     Then Verify that the "Skip" text is displayed

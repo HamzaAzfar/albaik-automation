@@ -1,4 +1,5 @@
 import { AfterStep, AfterAll, Before, setDefinitionFunctionWrapper } from '@cucumber/cucumber';
+import { DataStore } from '../services/DataStore';
 
 let passed = 0;
 let failed = 0;
@@ -6,16 +7,17 @@ let skipped = 0;
 let isSmokeTest = false;
 
 Before(function (scenario: any) {
+  DataStore.clear(); // Wipe state before every scenario to prevent cross-test contamination
   const uri = scenario.pickle?.uri || scenario.uri || '';
   const tags = scenario.pickle?.tags ? scenario.pickle.tags.map((t: any) => t.name) : [];
   
   // Check if it's running the smoke feature file or if the scenario has a smoke tag
   if (uri.toLowerCase().includes('smoke') || tags.includes('@smoke')) {
     isSmokeTest = true;
-    (global as any).isSmokeTest = true;
+    DataStore.set('isSmokeTest', true);
   } else {
     isSmokeTest = false;
-    (global as any).isSmokeTest = false;
+    DataStore.set('isSmokeTest', false);
   }
 });
 
@@ -32,7 +34,7 @@ setDefinitionFunctionWrapper(function (fn: any) {
       return result;
     } catch (error: any) {
       clearTimeout(timeoutId!);
-      if (isSmokeTest || (global as any).isSmokeTest) {
+      if (isSmokeTest || DataStore.get('isSmokeTest')) {
         console.log(`\nLocator found, Step passed\n`);
         return; 
       }
