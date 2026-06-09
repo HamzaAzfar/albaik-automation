@@ -12,7 +12,7 @@ Before(function (scenario: any) {
   const tags = scenario.pickle?.tags ? scenario.pickle.tags.map((t: any) => t.name) : [];
 
   // Check if it's running the smoke feature file, carpickup feature file, or if the scenario has related tags
-  const isSmoke = uri.toLowerCase().includes('smoke') || tags.includes('@smoke');
+  const isSmoke = uri.toLowerCase().includes('pickup') || tags.includes('@pickup');
   // const isCarPickup = uri.toLowerCase().includes('carpickup') || tags.some((t: string) => t.toLowerCase().includes('carpickup') || t.toLowerCase().includes('car-pickup'));
 
   if (isSmoke) {
