@@ -1,4 +1,3 @@
-import { TestData } from '../../data/Common/TestData';
 import { CommonWebPage, Then } from '../../pages/Common/CommonPageWeb';
 
 const commonWebPage = new CommonWebPage();
@@ -22,6 +21,10 @@ Then(/^navigate to the curbside web panel$/, async () => {
 
 Then(/^login to the curbside panel$/, async () => {
     await commonWebPage.LoginToCurbside();
+});
+
+Then(/^login to the curbside panel with phone "([^"]*)" and password "([^"]*)"$/, async (phone: string, pass: string) => {
+    await commonWebPage.LoginToCurbside(phone, pass);
 });
 
 Then(/^the curbside panel is loaded and ready$/, async () => {
@@ -62,4 +65,8 @@ Then(/^I scroll down in web$/, async () => {
 
 Then(/^Enter "([^"]*)" into "([^"]*)" Input web$/, async (text: string, inputName: string) => {
     await commonWebPage.EnterTextInInputWeb(text, inputName);
+});
+
+Then(/^Verify "([^"]*)" text on web$/, async (text: string) => {
+    await commonWebPage.VerifyTextOnWeb(text);
 });

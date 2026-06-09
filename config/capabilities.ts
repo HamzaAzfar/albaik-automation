@@ -94,7 +94,7 @@ export function getCapabilities(testPlatform = process.env.TEST_PLATFORM || 'mob
 
 
 
-    return browserCapabilities[browser] || browserCapabilities.chrome;
+    return browserCapabilities[browser as keyof typeof browserCapabilities] || browserCapabilities.chrome;
 
   }
 
@@ -104,7 +104,7 @@ export function getCapabilities(testPlatform = process.env.TEST_PLATFORM || 'mob
 
   const env = process.env.ENV?.toLowerCase() || 'staging';
 
-  const mobileEnv = mobileEnvironments[env];
+  const mobileEnv = mobileEnvironments[env as keyof typeof mobileEnvironments];
 
   if (platform === 'customer') {
 
@@ -126,7 +126,7 @@ export function getCapabilities(testPlatform = process.env.TEST_PLATFORM || 'mob
 
       'appium:fullReset': false,
 
-      'appium:newCommandTimeout': 240,
+      'appium:newCommandTimeout': 1800,
 
       'appium:autoGrantPermissions': true,
 
@@ -154,7 +154,7 @@ export function getCapabilities(testPlatform = process.env.TEST_PLATFORM || 'mob
 
       'appium:fullReset': false,
 
-      'appium:newCommandTimeout': 240,
+      'appium:newCommandTimeout': 1800,
 
       'appium:autoGrantPermissions': true,
 
@@ -184,7 +184,7 @@ export function getCapabilities(testPlatform = process.env.TEST_PLATFORM || 'mob
 
     'appium:fullReset': false,
 
-    'appium:newCommandTimeout': 240,
+    'appium:newCommandTimeout': 1800,
 
     'appium:autoGrantPermissions': true,
 

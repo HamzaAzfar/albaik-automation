@@ -40,5 +40,5 @@ try {
     }
     reporter.generate(options);
 } catch (error) {
-    console.error('WARNING: Could not generate Cucumber HTML report.', error.message);
+    console.error('WARNING: Could not generate Cucumber HTML report.', (error as Error).message);
 }

@@ -32,35 +32,35 @@ const isWeb = TEST_PLATFORM === 'web';
 const testSpecs = (isDualMobile || isFullDelivery)
   ? ['./src/features/Common/**/*.feature']
   : isCrossPlatform
-  ? ['./src/features/Common/**/*.feature']
-  : isWeb
-  ? ['./src/features/Common/**/*.feature']
-  : ['./src/features/Common/**/*.feature'];
+    ? ['./src/features/Common/**/*.feature']
+    : isWeb
+      ? ['./src/features/Common/**/*.feature']
+      : ['./src/features/Common/**/*.feature'];
 
 const stepDefinitionFiles = (isDualMobile || isFullDelivery)
   ? [
-      './src/hooks/**/*.ts',
-      './src/stepdefinitions/Common/CommonStepMob.ts',
-      './src/stepdefinitions/Common/CommonStepWeb.ts',
-      './src/stepdefinitions/Common/**/*.ts',
-    ]
+    './src/hooks/**/*.ts',
+    './src/stepdefinitions/Common/CommonStepMob.ts',
+    './src/stepdefinitions/Common/CommonStepWeb.ts',
+    './src/stepdefinitions/Common/**/*.ts',
+  ]
   : isCrossPlatform
-  ? [
+    ? [
       './src/hooks/**/*.ts',
       './src/stepdefinitions/Common/CommonStepMob.ts',
       './src/stepdefinitions/Common/CommonStepWeb.ts',
       './src/stepdefinitions/Common/**/*.ts',
     ]
-  : isWeb
-  ? [
-      './src/hooks/**/*.ts',
-      './src/stepdefinitions/Common/CommonStepWeb.ts',
-      './src/stepdefinitions/Common/**/*.ts',
-    ]
-  : [
-      './src/hooks/**/*.ts',
-      './src/stepdefinitions/Common/CommonStepMob.ts',
-    ];
+    : isWeb
+      ? [
+        './src/hooks/**/*.ts',
+        './src/stepdefinitions/Common/CommonStepWeb.ts',
+        './src/stepdefinitions/Common/**/*.ts',
+      ]
+      : [
+        './src/hooks/**/*.ts',
+        './src/stepdefinitions/Common/CommonStepMob.ts',
+      ];
 
 
 
@@ -101,13 +101,13 @@ export const config: WebdriverIO.Config = {
 
 
 
-   exclude: [
+  exclude: [
     // No excluded features
   ],
 
 
 
- maxInstances: (isCrossPlatform || isDualMobile) ? 2 : 1,
+  maxInstances: (isCrossPlatform || isDualMobile) ? 2 : 1,
 
 
 
@@ -115,29 +115,29 @@ export const config: WebdriverIO.Config = {
 
     ? {
 
-        customerApp: {
+      customerApp: {
 
-          capabilities: getCapabilities('customer'),
+        capabilities: getCapabilities('customer'),
 
-        },
+      },
 
-        web: {
+      web: {
 
-          capabilities: getCapabilities('web'),
+        capabilities: getCapabilities('web'),
 
-        },
+      },
 
-        driverApp: {
+      driverApp: {
 
-          capabilities: getCapabilities('driver'),
+        capabilities: getCapabilities('driver'),
 
-        },
+      },
 
-      }
+    }
 
     : isDualMobile
 
-    ? {
+      ? {
 
         customerApp: {
 
@@ -153,32 +153,114 @@ export const config: WebdriverIO.Config = {
 
       }
 
-    : isCrossPlatform
+      : isCrossPlatform
 
-    ? {
+        ? {
 
-        mobile: {
+          mobile: {
 
-          capabilities: getCapabilities('mobile'),
+            capabilities: getCapabilities('mobile'),
 
-        },
+          },
 
-        web: {
+          web: {
 
-          capabilities: getCapabilities('web'),
+            capabilities: getCapabilities('web'),
 
-        },
+          },
 
-      }
+        }
 
-    : [getCapabilities(TEST_PLATFORM)]) as any,
+        : [getCapabilities(TEST_PLATFORM)]) as any,
 
 
 
 
   logLevel: 'error',
 
-  onPrepare: function () {
+  onPrepare: function (config, capabilities) {
+    try {
+      let tagExpressionStr = config.cucumberOpts?.tagExpression || '';
+      if (!tagExpressionStr) {
+        const tagArg = process.argv.find(arg => arg.startsWith('--cucumberOpts.tagExpression='));
+        if (tagArg) {
+          tagExpressionStr = tagArg.split('=')[1];
+        } else {
+          const tagIdx = process.argv.indexOf('--cucumberOpts.tagExpression');
+          if (tagIdx !== -1 && process.argv.length > tagIdx + 1) {
+            tagExpressionStr = process.argv[tagIdx + 1];
+          }
+        }
+      }
+
+      let expressionNode = null;
+      if (tagExpressionStr) {
+        try {
+          const tagExprParser = require('@cucumber/tag-expressions').default;
+          expressionNode = tagExprParser(tagExpressionStr);
+        } catch (e) { console.log('Tag parse error', e); }
+      }
+
+      function getFeatureFiles(dir: string, fileList: string[] = []) {
+        const files = fs.readdirSync(dir);
+        for (const file of files) {
+          const filePath = path.join(dir, file);
+          if (fs.statSync(filePath).isDirectory()) {
+            getFeatureFiles(filePath, fileList);
+          } else if (filePath.endsWith('.feature')) {
+            fileList.push(filePath);
+          }
+        }
+        return fileList;
+      }
+      const featureFiles = getFeatureFiles(path.join(process.cwd(), 'src', 'features', 'Common'));
+      let totalScenarios = 0;
+      let totalSteps = 0;
+
+      for (const file of featureFiles) {
+        const content = fs.readFileSync(file, 'utf-8');
+        const lines = content.split('\n');
+
+        let featureTags: string[] = [];
+        let currentTags: string[] = [];
+        let insideExecutingScenario = !expressionNode; // If no tag filter, execute all
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+
+          if (trimmed.startsWith('@')) {
+            currentTags = currentTags.concat(trimmed.split(/\s+/));
+          } else if (trimmed.startsWith('Feature:')) {
+            featureTags = [...currentTags];
+            currentTags = [];
+          } else if (trimmed.startsWith('Scenario:') || trimmed.startsWith('Scenario Outline:')) {
+            const combinedTags = [...new Set([...featureTags, ...currentTags])];
+            if (expressionNode) {
+              insideExecutingScenario = expressionNode.evaluate(combinedTags);
+            }
+            if (insideExecutingScenario) {
+              totalScenarios++;
+            }
+            currentTags = [];
+          } else if (/^(Given|When|Then|And|But)\s/.test(trimmed)) {
+            if (insideExecutingScenario) {
+              totalSteps++;
+            }
+          }
+        }
+      }
+      console.log(`\n==================================================`);
+      console.log(`🚀 TEST EXECUTION PLAN`);
+      if (tagExpressionStr) {
+        console.log(`   Tag Filter Applied         : ${tagExpressionStr}`);
+      }
+      console.log(`   Total Scenarios to Execute : ${totalScenarios}`);
+      console.log(`   Total Steps to Execute     : ${totalSteps}`);
+      console.log(`==================================================\n`);
+    } catch (error) {
+      console.log('Could not count scenarios/steps at start:', error);
+    }
+
     const allureResultsPath = path.join(process.cwd(), 'allure-results');
     const allureReportPath = path.join(process.cwd(), 'allure-report');
     const cucumberJsonPath = path.join(process.cwd(), 'cucumber-json-reports');
@@ -201,6 +283,33 @@ export const config: WebdriverIO.Config = {
 
   onComplete: function () {
     try {
+      let totalScenariosPassed = 0;
+      let totalScenariosFailed = 0;
+      let totalStepsPassed = 0;
+      let totalStepsFailed = 0;
+
+      const files = fs.readdirSync(process.cwd()).filter(f => f.startsWith('test-summary-') && f.endsWith('.json'));
+      for (const file of files) {
+        try {
+          const data = JSON.parse(fs.readFileSync(path.join(process.cwd(), file), 'utf8'));
+          totalScenariosPassed += data.scenariosPassed || 0;
+          totalScenariosFailed += data.scenariosFailed || 0;
+          totalStepsPassed += data.stepsPassed || 0;
+          totalStepsFailed += data.stepsFailed || 0;
+          fs.unlinkSync(path.join(process.cwd(), file));
+        } catch (e) { }
+      }
+
+      console.log(`\n==================================================`);
+      console.log(`📊 FINAL TEST EXECUTION SUMMARY`);
+      console.log(`   Scenarios Passed : ${totalScenariosPassed}`);
+      console.log(`   Scenarios Failed : ${totalScenariosFailed}`);
+      console.log(`   Steps Passed     : ${totalStepsPassed}`);
+      console.log(`   Steps Failed     : ${totalStepsFailed}`);
+      console.log(`==================================================\n`);
+    } catch (e) { }
+
+    try {
       execSync('npx ts-node scripts/generate-cucumber-report.ts', { stdio: 'inherit' });
       console.log('\n✅ Cucumber HTML report ready → cucumber-html-reports/index.html');
       console.log('   View:  npm run report:cucumber:open\n');
@@ -213,7 +322,7 @@ export const config: WebdriverIO.Config = {
     } catch (e) {
       console.error('Could not generate Cucumber HTML report:', e);
     }
-    
+
     // Note for Allure Backup
     console.log('ℹ️  Allure report auto-generation is disabled (Cucumber is primary).');
     console.log('   To generate Allure manually as a backup, run: npm run allure:report\n');
@@ -230,7 +339,7 @@ export const config: WebdriverIO.Config = {
 
 
 
-  connectionRetryCount: 3,
+  connectionRetryCount: parseInt(process.env.CONNECTION_RETRY_COUNT || '3', 10),
 
 
 
@@ -266,9 +375,9 @@ export const config: WebdriverIO.Config = {
 
   reporters: [
 
-    ['spec', { 
-      realtimeReporting: !(isCrossPlatform || isDualMobile || isFullDelivery),
-      showBrowserCapabilities: false 
+    ['spec', {
+      realtimeReporting: true,
+      showBrowserCapabilities: false
     }],
 
     [
@@ -301,6 +410,15 @@ export const config: WebdriverIO.Config = {
 
 
   afterStep: async function (step, scenario, result, context) {
+    const summaryFile = path.join(process.cwd(), `test-summary-${process.pid}.json`);
+    let summary = { scenariosPassed: 0, scenariosFailed: 0, stepsPassed: 0, stepsFailed: 0 };
+    if (fs.existsSync(summaryFile)) {
+      try { summary = JSON.parse(fs.readFileSync(summaryFile, 'utf8')); } catch (e) { }
+    }
+    if (result.passed) summary.stepsPassed++;
+    else summary.stepsFailed++;
+    fs.writeFileSync(summaryFile, JSON.stringify(summary));
+
     if (!result.passed) {
       try {
         const screenshot = await browser.takeScreenshot();
@@ -319,6 +437,14 @@ export const config: WebdriverIO.Config = {
   },
 
   afterScenario: async function (_world, result) {
+    const summaryFile = path.join(process.cwd(), `test-summary-${process.pid}.json`);
+    let summary = { scenariosPassed: 0, scenariosFailed: 0, stepsPassed: 0, stepsFailed: 0 };
+    if (fs.existsSync(summaryFile)) {
+      try { summary = JSON.parse(fs.readFileSync(summaryFile, 'utf8')); } catch (e) { }
+    }
+    if (result.passed) summary.scenariosPassed++;
+    else summary.scenariosFailed++;
+    fs.writeFileSync(summaryFile, JSON.stringify(summary));
 
     if (!result.passed) {
 
@@ -392,7 +518,7 @@ export const config: WebdriverIO.Config = {
 
     ignoreUndefinedDefinitions: false,
 
-    retry: parseInt(process.env.RETRY_COUNT || '1', 10),
+    retry: parseInt(process.env.RETRY_COUNT || '0', 10),
 
 
   },

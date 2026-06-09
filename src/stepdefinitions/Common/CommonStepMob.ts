@@ -111,6 +111,14 @@ Then(
   }
 );
 
+Then('Turn on Mobile location', async () => {
+  await commonFunctionPage.TurnOnMobileLocation();
+});
+
+Then('Kill app and open it again', async () => {
+  await commonFunctionPage.KillAndReopenApp();
+});
+
 
 
 

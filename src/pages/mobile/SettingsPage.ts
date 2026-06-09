@@ -1,4 +1,4 @@
-import { BasePage } from '../../common/mobile/BasePage';
+import { BasePage } from '../../common/BasePage';
 
 class SettingsPage extends BasePage {
 

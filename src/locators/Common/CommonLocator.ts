@@ -1,18 +1,15 @@
 export const CommonLocators = {
-  bottomSheetAnchor:
-    '//android.view.ViewGroup[@content-desc="Pickup from a restaurant"]',
+  // Mobile Locators
+  PickupOption: '//android.view.ViewGroup[@content-desc="Pickup from a restaurant"]',
 
-  pickupOption:
-    '//android.view.ViewGroup[@content-desc="Pickup from a restaurant"]',
-
-  closeButtonSelectors: [
+  CloseButtonSelectors: [
     'android=new UiSelector().descriptionMatches("(?i)close")',
     'android=new UiSelector().descriptionMatches("(?i).*close.*")',
     'android=new UiSelector().textMatches("(?i)close|×|x")',
     'android=new UiSelector().className("android.widget.ImageView").descriptionMatches("(?i).*(close|dismiss|cross).*")',
   ],
 
-  pickupScreenIndicators: [
+  PickupScreenIndicators: [
     'android=new UiSelector().textMatches("(?i).*select.*restaurant.*")',
     'android=new UiSelector().textMatches("(?i).*nearest.*restaurant.*")',
     'android=new UiSelector().textMatches("(?i).*choose.*branch.*")',
@@ -20,181 +17,139 @@ export const CommonLocators = {
     'android=new UiSelector().descriptionMatches("(?i).*restaurant.*list.*")',
   ],
 
-  chooseRestaurantButton:
-    'android=new UiSelector().textMatches("(?i).*choose.*restaurant.*")',
+  ChooseRestaurantButton: 'android=new UiSelector().textMatches("(?i).*choose.*restaurant.*")',
+  SearchManuallyButton: 'android=new UiSelector().textMatches("(?i).*search.*manually.*")',
 
-  searchManuallyButton:
-    'android=new UiSelector().textMatches("(?i).*search.*manually.*")',
-
-  searchFieldSelectors: [
+  SearchFieldSelectors: [
     'android=new UiSelector().resourceIdMatches("(?i).*search.*")',
     'android=new UiSelector().className("android.widget.EditText").descriptionMatches("(?i).*search.*")',
     'android=new UiSelector().className("android.widget.EditText").textMatches("(?i).*search.*")',
   ],
 
-  carPickupButton:
-    'android=new UiSelector().textMatches("(?i).*car.*pickup.*")',
+  CarPickupButton: 'android=new UiSelector().textMatches("(?i).*car.*pickup.*")',
+  BringItToMyCarButton: 'android=new UiSelector().textMatches("(?i).*bring.*it.*to.*my.*car.*")',
+  OrderHereButton: 'android=new UiSelector().textMatches("(?i).*order.*here.*")',
 
-  bringItToMyCarButton:
-    'android=new UiSelector().textMatches("(?i).*bring.*it.*to.*my.*car.*")',
+  OrderConfirmationPanel: 'android=new UiSelector().textMatches("(?i).*order.*confirmed.*|.*thank.*you.*|.*success.*")',
+  OrderIdText: 'android=new UiSelector().textMatches("(?i).*order.*id.*|.*#.*")',
+  OrderSuccessMessage: 'android=new UiSelector().textMatches("(?i).*order.*placed.*successfully.*|.*order.*confirmed.*")',
+  OrderId: 'android=new UiSelector().className("android.widget.TextView").textMatches("[0-9]{6,}")',
 
-  orderHereButton:
-    'android=new UiSelector().textMatches("(?i).*order.*here.*")',
-
-  orderConfirmationPanel:
-    'android=new UiSelector().textMatches("(?i).*order.*confirmed.*|.*thank.*you.*|.*success.*")',
-
-  orderIdText:
-    'android=new UiSelector().textMatches("(?i).*order.*id.*|.*#.*")',
-
-  orderSuccessMessage:
-    'android=new UiSelector().textMatches("(?i).*order.*placed.*successfully.*|.*order.*confirmed.*")',
-
-  orderId: 'android=new UiSelector().className("android.widget.TextView").textMatches("[0-9]{6,}")',
-
-  noticePopupText: [
+  NoticePopupText: [
     '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]',
   ],
-      totalAmountText: "//android.widget.TextView[contains(@text, '﷼')]",
-      basketTotalAmount: "(//android.widget.TextView[contains(@text, '﷼')])[last()]",
-      checkoutTotalAmount: "//android.widget.TextView[contains(@text, '﷼')]",
 
+  TotalAmountText: "//android.widget.TextView[contains(@text, '﷼')]",
+  BasketTotalAmount: "(//android.widget.TextView[contains(@text, '﷼')])[last()]",
+  CheckoutTotalAmount: "//android.widget.TextView[contains(@text, '﷼')]",
 
-  noticeCloseButton: [
+  NoticeCloseButton: [
     '//android.view.ViewGroup[@content-desc="Close"]',
     'android=new UiSelector().descriptionMatches("(?i).*close.*")',
     'android=new UiSelector().descriptionMatches("(?i)close")',
   ],
-   // Navigation
-  adminPanelTitle: '//h1[contains(text(), "Admin Panel")]',
-  ordersMenu: '//a[contains(text(), "Orders")]',
-  dashboardMenu: '//a[contains(text(), "Dashboard")]',
 
-  // Search and Filter
-  searchOrderField: '//input[@placeholder="Search Order ID"]',
-  searchButton: '//button[contains(text(), "Search")]',
-  filterByStatus: '//select[@id="statusFilter"]',
+  // Web Locators
+  AdminPanelTitle: '//h1[contains(text(), "Admin Panel")]',
+  OrdersMenu: '//a[contains(text(), "Orders")]',
+  DashboardMenu: '//a[contains(text(), "Dashboard")]',
 
-  // Order Details Table
-  ordersTable: '//table[@class="orders-table"]',
-  orderRow: (orderId: string) => `//tr[contains(., "${orderId}")]`,
-  orderStatusCell: (orderId: string) => `//tr[contains(., "${orderId}")]//td[@class="status"]`,
-  orderServiceTypeCell: (orderId: string) => `//tr[contains(., "${orderId}")]//td[@class="serviceType"]`,
-  orderStoreCell: (orderId: string) => `//tr[contains(., "${orderId}")]//td[@class="storeName"]`,
+  SearchOrderField: '//input[@placeholder="Search Order ID"]',
+  SearchButton: '//button[contains(text(), "Search")]',
+  FilterByStatus: '//select[@id="statusFilter"]',
 
-  // Order Details Panel
-  orderDetailsPanel: '//div[@class="order-details-panel"]',
-  orderIdDisplay: '//span[@id="orderID"]',
-  orderStatusDisplay: '//span[@id="status"]',
-  orderTypeDisplay: '//span[@id="orderType"]',
-  serviceTypeDisplay: '//span[@id="serviceType"]',
-  storeNameDisplay: '//span[@id="storeName"]',
-  orderTimestamp: '//span[@id="timestamp"]',
+  OrdersTable: '//table[@class="orders-table"]',
+  OrderRow: (orderId: string) => `//tr[contains(., "${orderId}")]`,
+  OrderStatusCell: (orderId: string) => `//tr[contains(., "${orderId}")]//td[@class="status"]`,
+  OrderServiceTypeCell: (orderId: string) => `//tr[contains(., "${orderId}")]//td[@class="serviceType"]`,
+  OrderStoreCell: (orderId: string) => `//tr[contains(., "${orderId}")]//td[@class="storeName"]`,
 
-  // Actions
-  approveButton: '//button[contains(text(), "Approve")]',
-  rejectButton: '//button[contains(text(), "Reject")]',
-  closeButton: '//button[contains(text(), "Close")]',
-  refreshButton: '//button[@id="refresh"]',
-    pageHeading: 'h1',
-  moreInfoLink: 'a',
+  OrderDetailsPanel: '//div[@class="order-details-panel"]',
+  OrderIdDisplay: '//span[@id="orderID"]',
+  OrderStatusDisplay: '//span[@id="status"]',
+  OrderTypeDisplay: '//span[@id="orderType"]',
+  ServiceTypeDisplay: '//span[@id="serviceType"]',
+  StoreNameDisplay: '//span[@id="storeName"]',
+  OrderTimestamp: '//span[@id="timestamp"]',
+
+  ApproveButton: '//button[contains(text(), "Approve")]',
+  RejectButton: '//button[contains(text(), "Reject")]',
+  CloseButton: '//button[contains(text(), "Close")]',
+  RefreshButton: '//button[@id="refresh"]',
+  PageHeading: 'h1',
+  MoreInfoLink: 'a',
   
-  dynamicTextInput: (text: string) => `//android.widget.EditText[@text="${text}" or @resource-id="${text}"]`,
-    // Tracking Card
-  trackingCard: (resourceId: string) =>
-    `//android.view.ViewGroup[@resource-id="${resourceId}"]`,
-
-  // Dynamic Order ID inside tracking card
-  trackingOrderId: (resourceId: string) =>
-    `//android.view.ViewGroup[@resource-id="${resourceId}"]//android.widget.TextView[contains(@text,"#")]`,
-   // Dynamic Search Field on Web
-  dynamicSearchField: (placeholder: string) =>
-    `//input[@placeholder="${placeholder}"]`,
-    
-  webLinkByHref: (href: string) => {
-    const predefined: { [key: string]: string } = {
-      'Assign order to me': "//a[normalize-space()='Assign order to me']",
-      'Assign manually': "//a[normalize-space()='Assign manually']",
-        'Assign order': "//input[@name='commit']",
-      'KTM Test Branch': "//a[normalize-space()='KTM Test Branch']",
-      'Restaurant dashboard': "//a[normalize-space()='Restaurant dashboard']",
-      'Print Receipt & Start Collecting': "//button[normalize-space()='Print Receipt & Start Collecting']",
-      'OK': "//button[normalize-space()='OK']",
-      'Prepared': "//button[normalize-space()='Prepared']",
-      'Fail': "//button[normalize-space()='Fail']",
-      'Create Refund': "//input[@name='commit']",
-      'Refund order': "//a[normalize-space()='Refund order']",
-      'Partial': "//label[normalize-space()='Partial']"
-    };
-    return predefined[href] || `//a[@href="${href}"]`;
-  },
-  webInputById: (id: string) => `//input[@id="${id}"]`,
-  systemButton: (btn_name: string) => `//android.widget.Button[@resource-id="${btn_name}"]`,
-
-
-  // Dynamic Order Row
-  dynamicOrderRow: (orderId: string) =>
-    `//*[contains(text(),"${orderId}")]`,
-  emailInput: '//input[@name="email" or @type="email"]',
-  curbsidePhoneInput: '//input[@type="tel" or contains(@name, "phone") or @id="user_phone" or @name="email" or @type="email" or @id="user_login"]',
-  webPasswordInput: '//input[@name="password" or @type="password"]',
-  passwordInput: '//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[2]/android.widget.EditText',
-  loginBtn: "//input[@name='commit']",
-  cardEndingWith: (lastFourDigits: string) => `//android.view.ViewGroup[@content-desc="ENDING, ${lastFourDigits}"]/com.horcrux.svg.SvgView/com.horcrux.svg.g/com.horcrux.svg.p`,
+  DynamicTextInput: (text: string) => `//android.widget.EditText[@text="${text}" or @resource-id="${text}"]`,
+  TrackingCard: (resourceId: string) => `//android.view.ViewGroup[@resource-id="${resourceId}"]`,
+  TrackingOrderId: (resourceId: string) => `//android.view.ViewGroup[@resource-id="${resourceId}"]//android.widget.TextView[contains(@text,"#")]`,
+  DynamicSearchField: (placeholder: string) => `//input[@placeholder="${placeholder}"]`,
+  WebInputById: (id: string) => `//input[@id="${id}"]`,
+  SystemButton: (btn_name: string) => `//android.widget.Button[@resource-id="${btn_name}"]`,
+  DynamicOrderRow: (orderId: string) => `//*[contains(text(),"${orderId}")]`,
+  
+  EmailInput: '//input[@name="email" or @type="email"]',
+  CurbsidePhoneInput: '//input[@type="tel" or contains(@name, "phone") or @id="user_phone" or @name="email" or @type="email" or @id="user_login"]',
+  WebPasswordInput: '//input[@name="password" or @type="password"]',
+  PasswordInput: '//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[2]/android.widget.EditText',
+  LoginBtn: "//input[@name='commit']",
+  CardEndingWith: (lastFourDigits: string) => `//android.view.ViewGroup[@content-desc="ENDING, ${lastFourDigits}"]/com.horcrux.svg.SvgView/com.horcrux.svg.g/com.horcrux.svg.p`,
   ChannelPicker: '//android.view.ViewGroup[@resource-id="ChannelPicker"]/android.view.ViewGroup/com.horcrux.svg.SvgView',
-  'android:id/content': [
+  
+  AndroidIdContent: [
     '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[4]/com.horcrux.svg.SvgView/com.horcrux.svg.g/ya1',
     '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[3]/com.horcrux.svg.SvgView/com.horcrux.svg.g/ya1',
     '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[3]/com.horcrux.svg.SvgView/com.horcrux.svg.g/Ca1',
     '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup[2]/android.view.ViewGroup[4]/com.horcrux.svg.SvgView/com.horcrux.svg.g/Ca1'
   ],
 
-  // --- Driver App Locators ---
-  "phoneNumber": '//android.widget.EditText[@content-desc="phoneNumber"]',
-  "password": '//android.widget.EditText[@content-desc="password"]',
-  "submit": '//android.view.ViewGroup[@content-desc="submit"]',
-  "Next": '//android.widget.Button[@content-desc="Next"]',
-  "I have read all the safety guidelines": '//android.widget.TextView[@text="I have read all the safety guidelines"]',
-  "Start the Ride": '//android.widget.Button[@content-desc="Start The Ride"]',
-  "Continue": '//android.view.ViewGroup[@content-desc="Continue"]',
-  "com.android.permissioncontroller:id/permission_allow_foreground_only_button": '//android.widget.Button[@resource-id="com.android.permissioncontroller:id/permission_allow_foreground_only_button"]',
-  "Join restaurant queue": '//android.widget.TextView[@text="Join restaurant queue"]',
-  "KTM OFFICE": '//android.view.ViewGroup[@content-desc="العمل, KTM OFFICE"]/android.view.View',
-  "Choose this location": '//android.widget.TextView[@text="Choose this location"]',
-  "receipt number": '//android.widget.EditText[@content-desc="receipt number"]',
-  "Edit location": [
+  // Driver App Locators
+  DriverPhoneNumber: '//android.widget.EditText[@content-desc="phoneNumber"]',
+  DriverPassword: '//android.widget.EditText[@content-desc="password"]',
+  SubmitBtn: '//android.view.ViewGroup[@content-desc="submit"]',
+  NextBtn: '//android.widget.Button[@content-desc="Next"]',
+  ReadSafetyGuidelines: '//android.widget.TextView[@text="I have read all the safety guidelines"]',
+  StartTheRide: '//android.widget.Button[@content-desc="Start The Ride"]',
+  ContinueBtn: '//android.view.ViewGroup[@content-desc="Continue"]',
+  AllowForegroundPermission: '//android.widget.Button[@resource-id="com.android.permissioncontroller:id/permission_allow_foreground_only_button"]',
+  JoinRestaurantQueue: '//android.widget.TextView[@text="Join restaurant queue"]',
+  KtmOffice: '//android.view.ViewGroup[@content-desc="العمل, KTM OFFICE"]/android.view.View',
+  ChooseThisLocation: '//android.widget.TextView[@text="Choose this location"]',
+  ReceiptNumber: '//android.widget.EditText[@content-desc="receipt number"]',
+  
+  EditLocation: [
     '//android.view.ViewGroup[@content-desc="Home, Virtual force"]/android.view.ViewGroup[2]',
     '//android.view.ViewGroup[@content-desc="Home, Virtual force edited"]/android.view.ViewGroup[2]/com.horcrux.svg.SvgView/com.horcrux.svg.g/Ca1[1]',
     '//android.view.ViewGroup[@content-desc="Home, Virtual force"]/android.view.ViewGroup[2]/com.horcrux.svg.SvgView/com.horcrux.svg.g/Ca1[1]',
     '//android.view.ViewGroup[@content-desc="Home, Virtual force"]/android.view.ViewGroup[2]/com.horcrux.svg.SvgView/com.horcrux.svg.g/*[1]'
   ],
-  "Virtual force card": [
+  VirtualForceCard: [
     '//android.view.ViewGroup[@content-desc="Home, Virtual force edited"]/android.view.View',
     '//android.widget.TextView[@text="Virtual force"]'
   ],
-  "Saved building information": '//android.widget.EditText[@text="Virtual force"]',
-  "Save and continue": '//android.widget.TextView[@text="Save and continue"]',
-  "Delete saved location": '//android.widget.TextView[@text="Delete saved location"]',
-  "Save card details": '//android.widget.TextView[@text="Save card details to check out faster everywhere Checkout.com is available"]',
-  "checkout email": '//android.widget.EditText[@resource-id="rm_edit_email_input"]/android.view.View[2]',
-  "Add button": '//android.view.ViewGroup[@resource-id="Add button"]',
-  "Reduce button": '//android.view.ViewGroup[@resource-id="Reduce button"]',
-  "Edit order": [
+  SavedBuildingInfo: '//android.widget.EditText[@text="Virtual force"]',
+  SaveAndContinue: '//android.widget.TextView[@text="Save and continue"]',
+  DeleteSavedLocation: '//android.widget.TextView[@text="Delete saved location"]',
+  SaveCardDetails: '//android.widget.TextView[@text="Save card details to check out faster everywhere Checkout.com is available"]',
+  CheckoutEmail: '//android.widget.EditText[@resource-id="rm_edit_email_input"]/android.view.View[2]',
+  AddButton: '//android.view.ViewGroup[@resource-id="Add button"]',
+  ReduceButton: '//android.view.ViewGroup[@resource-id="Reduce button"]',
+  
+  EditOrder: [
     '//android.view.ViewGroup[@content-desc="Edit order"]',
     '//android.widget.TextView[@text="Edit order"]'
   ],
-  "Cancel order": [
+  CancelOrder: [
     '//android.view.ViewGroup[@content-desc="Cancel order"]',
     '//android.widget.TextView[@text="Cancel order"]'
   ],
-  "Confirm Edit": [
+  ConfirmEdit: [
     '//android.widget.TextView[@text="Confirm Edit"]',
     '//android.view.ViewGroup[@content-desc="Confirm Edit"]'
   ],
-  "Confirm Order": [
+  ConfirmOrder: [
     '//android.view.ViewGroup[@content-desc="Confirm Order"]',
     '//android.widget.TextView[@text="Confirm Order"]'
   ],
-  "OTP": '(//android.widget.ScrollView/android.view.ViewGroup/android.widget.EditText[@text="0"])[1]',
-  "refund_amount": "//input[@id='refund_amount']"
+  OtpInput: '(//android.widget.ScrollView/android.view.ViewGroup/android.widget.EditText[@text="0"])[1]',
+  RefundAmount: "//input[@id='refund_amount']"
 };
