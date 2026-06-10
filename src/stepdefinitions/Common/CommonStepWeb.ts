@@ -1,14 +1,15 @@
 import { CommonWebPage, Then } from '../../pages/Common/CommonPageWeb';
+import WebLoginPage from '../../pages/web/WebLoginPage';
 
 const commonWebPage = new CommonWebPage();
 
 
 Then(/^navigate to the web admin panel$/, async () => {
-    await commonWebPage.NavigateToAdminPanel();
+    await WebLoginPage.NavigateToAdminPanel();
 });
 
 Then(/^login to the admin panel$/, async () => {
-    await commonWebPage.LoginToAdmin();
+    await WebLoginPage.LoginToAdmin();
 });
 
 Then(/^the restaurant panel is loaded and ready$/, async () => {
@@ -16,20 +17,16 @@ Then(/^the restaurant panel is loaded and ready$/, async () => {
 });
 
 Then(/^navigate to the curbside web panel$/, async () => {
-    await commonWebPage.NavigateToCurbsidePanel();
+    await WebLoginPage.NavigateToCurbsidePanel();
 });
 
-Then(/^login to the curbside panel$/, async () => {
-    await commonWebPage.LoginToCurbside();
-});
+
 
 Then(/^login to the curbside panel with phone "([^"]*)" and password "([^"]*)"$/, async (phone: string, pass: string) => {
-    await commonWebPage.LoginToCurbside(phone, pass);
+    await WebLoginPage.LoginToCurbside(phone, pass);
 });
 
-Then(/^the curbside panel is loaded and ready$/, async () => {
-    await commonWebPage.WaitForCurbsidePanel();
-});
+
 
 Then(/^wait for "(\d+)" seconds in web$/, async (seconds: string) => {
     await commonWebPage.WaitForSecondsWeb(parseInt(seconds));

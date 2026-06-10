@@ -250,7 +250,7 @@ export const config: WebdriverIO.Config = {
         }
       }
       console.log(`\n==================================================`);
-      console.log(`🚀 TEST EXECUTION PLAN`);
+      console.log(`TEST EXECUTION PLAN`);
       if (tagExpressionStr) {
         console.log(`   Tag Filter Applied         : ${tagExpressionStr}`);
       }
@@ -279,6 +279,13 @@ export const config: WebdriverIO.Config = {
     if (fs.existsSync(cucumberHtmlPath)) {
       fs.rmSync(cucumberHtmlPath, { recursive: true, force: true });
     }
+
+    try {
+      const files = fs.readdirSync(process.cwd()).filter(f => f.startsWith('test-summary-') && f.endsWith('.json'));
+      for (const file of files) {
+        fs.unlinkSync(path.join(process.cwd(), file));
+      }
+    } catch (e) {}
   },
 
   onComplete: function () {
@@ -301,7 +308,7 @@ export const config: WebdriverIO.Config = {
       }
 
       console.log(`\n==================================================`);
-      console.log(`📊 FINAL TEST EXECUTION SUMMARY`);
+      console.log(`FINAL TEST EXECUTION SUMMARY`);
       console.log(`   Scenarios Passed : ${totalScenariosPassed}`);
       console.log(`   Scenarios Failed : ${totalScenariosFailed}`);
       console.log(`   Steps Passed     : ${totalStepsPassed}`);
@@ -310,8 +317,8 @@ export const config: WebdriverIO.Config = {
     } catch (e) { }
 
     try {
-      execSync('npx ts-node scripts/generate-cucumber-report.ts', { stdio: 'inherit' });
-      console.log('\n✅ Cucumber HTML report ready → cucumber-html-reports/index.html');
+      execSync('npx tsx scripts/generate-cucumber-report.ts', { stdio: 'inherit' });
+      console.log('\n Cucumber HTML report ready → cucumber-html-reports/index.html');
       console.log('   View:  npm run report:cucumber:open\n');
 
       if (!process.env.CI) {
@@ -324,7 +331,7 @@ export const config: WebdriverIO.Config = {
     }
 
     // Note for Allure Backup
-    console.log('ℹ️  Allure report auto-generation is disabled (Cucumber is primary).');
+    console.log('ℹAllure report auto-generation is disabled (Cucumber is primary).');
     console.log('   To generate Allure manually as a backup, run: npm run allure:report\n');
   },
 
@@ -375,10 +382,6 @@ export const config: WebdriverIO.Config = {
 
   reporters: [
 
-    ['spec', {
-      realtimeReporting: true,
-      showBrowserCapabilities: false
-    }],
 
     [
 
@@ -407,6 +410,9 @@ export const config: WebdriverIO.Config = {
 
   ],
 
+  beforeScenario: function (world, context) {
+    console.log(`\n▶ Scenario: ${world.pickle.name}`);
+  },
 
 
   afterStep: async function (step, scenario, result, context) {
@@ -415,8 +421,13 @@ export const config: WebdriverIO.Config = {
     if (fs.existsSync(summaryFile)) {
       try { summary = JSON.parse(fs.readFileSync(summaryFile, 'utf8')); } catch (e) { }
     }
-    if (result.passed) summary.stepsPassed++;
-    else summary.stepsFailed++;
+    if (result.passed) {
+      summary.stepsPassed++;
+      console.log(`   \x1b[32m✔\x1b[0m ${step.text}`);
+    } else {
+      summary.stepsFailed++;
+      console.log(`   \x1b[31m✖\x1b[0m ${step.text} \x1b[31m(FAILED)\x1b[0m`);
+    }
     fs.writeFileSync(summaryFile, JSON.stringify(summary));
 
     if (!result.passed) {

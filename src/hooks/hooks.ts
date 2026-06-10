@@ -28,7 +28,6 @@ setDefinitionFunctionWrapper(function (fn: any) {
   const wrapper = async function (this: any, ...args: any[]) {
     if (isSmokeTest || DataStore.get('isSmokeTest')) {
       await new Promise(resolve => setTimeout(resolve, 500));
-      console.log(`\nLocator found, Step passed\n`);
       return;
     }
 
