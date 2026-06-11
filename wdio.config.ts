@@ -40,26 +40,25 @@ const testSpecs = (isDualMobile || isFullDelivery)
 const stepDefinitionFiles = (isDualMobile || isFullDelivery)
   ? [
     './src/hooks/**/*.ts',
-    './src/stepdefinitions/Common/CommonStepMob.ts',
-    './src/stepdefinitions/Common/CommonStepWeb.ts',
-    './src/stepdefinitions/Common/**/*.ts',
+    './src/stepdefinitions/**/*.ts',
   ]
   : isCrossPlatform
     ? [
       './src/hooks/**/*.ts',
-      './src/stepdefinitions/Common/CommonStepMob.ts',
-      './src/stepdefinitions/Common/CommonStepWeb.ts',
-      './src/stepdefinitions/Common/**/*.ts',
+      './src/stepdefinitions/**/*.ts',
     ]
     : isWeb
       ? [
         './src/hooks/**/*.ts',
         './src/stepdefinitions/Common/CommonStepWeb.ts',
         './src/stepdefinitions/Common/**/*.ts',
+        './src/stepdefinitions/web/**/*.ts',
       ]
       : [
         './src/hooks/**/*.ts',
         './src/stepdefinitions/Common/CommonStepMob.ts',
+        './src/stepdefinitions/Common/**/*.ts',
+        './src/stepdefinitions/mobile/**/*.ts',
       ];
 
 
@@ -285,7 +284,7 @@ export const config: WebdriverIO.Config = {
       for (const file of files) {
         fs.unlinkSync(path.join(process.cwd(), file));
       }
-    } catch (e) {}
+    } catch (e) { }
   },
 
   onComplete: function () {

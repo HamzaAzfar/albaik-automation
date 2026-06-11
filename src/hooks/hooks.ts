@@ -10,14 +10,10 @@ let isSmokeTest = false;
 
 setDefinitionFunctionWrapper(function (fn: any) {
   const wrapper = async function (this: any, ...args: any[]) {
-    if (isSmokeTest || DataStore.get('isSmokeTest')) {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return;
-    }
+
 
     let timeoutId: NodeJS.Timeout;
     try {
-      // Enforce an internal 230s timeout, catching it before the hard 240s Cucumber timeout
       const timeoutPromise = new Promise((_, reject) => {
         timeoutId = setTimeout(() => reject(new Error("Step execution exceeded 230s falling back to other locator.")), 230000);
       });
