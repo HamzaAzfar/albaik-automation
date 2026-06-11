@@ -6,23 +6,7 @@ let failed = 0;
 let skipped = 0;
 let isSmokeTest = false;
 
-Before(function (scenario: any) {
-  DataStore.clear(); // Wipe state before every scenario to prevent cross-test contamination
-  const uri = scenario.pickle?.uri || scenario.uri || '';
-  const tags = scenario.pickle?.tags ? scenario.pickle.tags.map((t: any) => t.name) : [];
 
-  // Check if it's running the smoke feature file, carpickup feature file, or if the scenario has related tags
-  const isSmoke = uri.toLowerCase().includes('SmokeTest') || tags.includes('@SmokeTest');
-  // const isCarPickup = uri.toLowerCase().includes('carpickup') || tags.some((t: string) => t.toLowerCase().includes('carpickup') || t.toLowerCase().includes('car-pickup'));
-
-  if (isSmoke) {
-    isSmokeTest = true;
-    DataStore.set('isSmokeTest', true);
-  } else {
-    isSmokeTest = false;
-    DataStore.set('isSmokeTest', false);
-  }
-});
 
 setDefinitionFunctionWrapper(function (fn: any) {
   const wrapper = async function (this: any, ...args: any[]) {
