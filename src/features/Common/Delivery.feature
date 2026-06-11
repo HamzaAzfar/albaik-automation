@@ -54,7 +54,7 @@ Feature: Delivery - Cross-Platform End-to-End Test
     Then Click on "Delivered" button
     Then Click on "Delivered" button
 
-  @Regression @TC_Regression_Delivery_Orders_001
+  @Regression @TC_Regression_Delivery_Orders_001 @RegressionTest
   Scenario: Verify that the customer can select the deliver order option.
     Given The Albaik application is launched on physical device
     Then Verify that the "Skip" text is displayed
@@ -73,7 +73,7 @@ Feature: Delivery - Cross-Platform End-to-End Test
     Then Click on "Choose this location" button
     Then I verify text "Delivery" is displayed
 
-  @Regression @TC_Regression_Delivery_Orders_004
+  @Regression @TC_Regression_Delivery_Orders_004 @RegressionTest
   Scenario: Verify the status of the order when the status is "Out for Delivery" and "Delivered" on the admin panel.
     Given The Albaik application is launched on physical device
     Then Verify that the "Skip" text is displayed
@@ -135,7 +135,7 @@ Feature: Delivery - Cross-Platform End-to-End Test
     Then Click on "Delivered" button
 
 
-  @Regression @TC_Regression_Delivery_Orders_006
+  @Regression @TC_Regression_Delivery_Orders_006 @RegressionTest
   Scenario: Verify the status of the order when the driver has marked order as "problem".
     Given The Albaik application is launched on physical device
     Then Verify that the "Skip" text is displayed
@@ -195,7 +195,7 @@ Feature: Delivery - Cross-Platform End-to-End Test
     Then Click on the order with captured order ID
     Then Verify "Failed" text on web
 
-  @Regression @TC_Regression_Delivery_Orders_007
+  @Regression @TC_Regression_Delivery_Orders_007 @RegressionTest
   Scenario: Verify that the customer can view the order details in the order history.
     Given The Albaik application is launched on physical device
     Then Verify that the "Skip" text is displayed
@@ -256,7 +256,7 @@ Feature: Delivery - Cross-Platform End-to-End Test
     Then Click on "Order history" button
     Then I verify text "Delivered" is displayed
 
-  @Regression @TC_Regression_Delivery_Orders_010
+  @Regression @TC_Regression_Delivery_Orders_010 @RegressionTest
   Scenario: Verify the status sync against all the platforms (consumer app, driver and admin).
     Given The Albaik application is launched on physical device
     Then Verify that the "Skip" text is displayed

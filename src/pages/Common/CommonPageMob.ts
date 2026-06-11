@@ -59,11 +59,6 @@ export class CommonFunctionPage extends BasePage {
     }
     await this.browserInstance.activateApp(pkg);
 
-    try {
-      await this.waitForElement(this.bottomSheetAnchor, 10000);
-    } catch (e) {
-      Logger.Info(`\n'Pickup from a restaurant' not found on launch\n`);
-    }
   }
 
   async LaunchDriverApplication(): Promise<void> {
@@ -178,7 +173,6 @@ export class CommonFunctionPage extends BasePage {
             return element;
           }
         } catch (e) {
-          Logger.Warn(`[HandleDynamicCheckout] Failed to click 'done' on keyboard: ${e}`);
         }
       }
       await this.browserInstance.pause(500);

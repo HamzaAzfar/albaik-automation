@@ -1,7 +1,7 @@
 @Login/Register
 Feature: Login/Registration
 
-    @Regression @TC_Regression_Login_Registration_003
+    @Regression @TC_Regression_Login_Registration_003 @RegressionTest
     Scenario: Verify that the "sign in" button is functional and the user is redirected to the home page upon tapping.
         Given The Albaik application is launched on physical device
         Then Verify that the "Skip" text is displayed
@@ -13,7 +13,7 @@ Feature: Login/Registration
         Then Click on "Sign In" button
         Then I verify text "Pickup from a restaurant" is displayed
 
-    @Regression @TC_Regression_Login_Registration_004
+    @Regression @TC_Regression_Login_Registration_004 @RegressionTest
     Scenario: Verify that the "sign in" button should not be functional and give error message until or unless all required fields are correctly filled.
         Given The Albaik application is launched on physical device
         Then Verify that the "Skip" text is displayed

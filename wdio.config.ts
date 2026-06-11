@@ -176,7 +176,7 @@ export const config: WebdriverIO.Config = {
 
 
 
-  logLevel: 'error',
+  logLevel: 'silent',
 
   onPrepare: function (config, capabilities) {
     try {
