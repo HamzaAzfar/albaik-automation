@@ -7,7 +7,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -22,7 +22,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Register" text is displayed
     Then Click on "Register" button
@@ -32,13 +32,14 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Click on "Register" button
     Then Verify that the "532255875" text is displayed
 
+
   @smoke @resetpassword
   Scenario: Reset password via Forgot Password link
     Given The Albaik application is launched on physical device
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -56,7 +57,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -137,7 +138,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -197,7 +198,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -214,7 +215,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -269,7 +270,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -337,7 +338,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -397,7 +398,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -414,7 +415,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -437,7 +438,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -489,7 +490,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -537,7 +538,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -546,7 +547,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then Verify that the "Order History" text is displayed
     Then Click on "Order History" button
     Then Verify that the "ORDER HISTORY" text is displayed
@@ -557,7 +558,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -566,7 +567,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then Verify that the "Order History" text is displayed
     Then Click on "Order History" button
     Then Verify that the "ORDER HISTORY" text is displayed
@@ -580,7 +581,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -589,7 +590,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then Verify that the "Account" text is displayed
     Then Click on "Account" button
     Then Verify that the "ACCOUNT SETTINGS" text is displayed
@@ -608,7 +609,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -665,7 +666,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -718,7 +719,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -776,7 +777,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -831,7 +832,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -877,7 +878,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -933,7 +934,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -986,7 +987,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -1009,7 +1010,7 @@ Feature: Smoke Tests - Cross-Platform End-to-End
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button

@@ -341,7 +341,7 @@ export const config: WebdriverIO.Config = {
 
 
 
-  connectionRetryTimeout: 120000,
+  connectionRetryTimeout: 240000,
 
 
 

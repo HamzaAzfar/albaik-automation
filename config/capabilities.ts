@@ -41,8 +41,8 @@ export function getCapabilities(testPlatform = process.env.TEST_PLATFORM || 'mob
             '--disable-logging',
 
             '--output=/dev/null',
-            
-            ...(process.env.CI ? ['--headless=new', '--no-sandbox'] : [])
+            '--window-size=1920,1080',
+            ...((process.env.CI || process.env.WEB_HEADLESS === 'true') ? ['--headless=new', '--no-sandbox'] : [])
 
           ],
 
@@ -130,6 +130,9 @@ export function getCapabilities(testPlatform = process.env.TEST_PLATFORM || 'mob
 
       'appium:autoGrantPermissions': true,
 
+      ...(process.env.AVD_NAME ? { 'appium:avd': process.env.AVD_NAME, 'appium:avdLaunchTimeout': 180000, 'appium:avdReadyTimeout': 180000 } : {}),
+      ...((process.env.CI || process.env.MOBILE_HEADLESS === 'true') ? { 'appium:isHeadless': true } : {}),
+
     };
 
   }
@@ -157,6 +160,9 @@ export function getCapabilities(testPlatform = process.env.TEST_PLATFORM || 'mob
       'appium:newCommandTimeout': 1800,
 
       'appium:autoGrantPermissions': true,
+
+      ...(process.env.AVD_NAME ? { 'appium:avd': process.env.AVD_NAME, 'appium:avdLaunchTimeout': 180000, 'appium:avdReadyTimeout': 180000 } : {}),
+      ...((process.env.CI || process.env.MOBILE_HEADLESS === 'true') ? { 'appium:isHeadless': true } : {}),
 
     };
 
@@ -188,7 +194,9 @@ export function getCapabilities(testPlatform = process.env.TEST_PLATFORM || 'mob
 
     'appium:autoGrantPermissions': true,
 
-    ...(process.env.UDID ? { 'appium:udid': process.env.UDID } : {}),
+    ...(process.env.UDID && !process.env.AVD_NAME ? { 'appium:udid': process.env.UDID } : {}),
+    ...(process.env.AVD_NAME ? { 'appium:avd': process.env.AVD_NAME, 'appium:avdLaunchTimeout': 180000, 'appium:avdReadyTimeout': 180000 } : {}),
+    ...((process.env.CI || process.env.MOBILE_HEADLESS === 'true') ? { 'appium:isHeadless': true } : {}),
 
   };
 

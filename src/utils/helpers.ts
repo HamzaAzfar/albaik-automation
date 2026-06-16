@@ -1,13 +1,7 @@
-export async function pause(ms: number): Promise<void> {
-  await browser.pause(ms);
-}
-
 export async function hideKeyboard(): Promise<void> {
-  try {
-    await browser.hideKeyboard();
-  } catch {
-    // Keyboard may not be visible
-  }
+
+  await browser.hideKeyboard();
+
 }
 
 export async function launchApp(): Promise<void> {

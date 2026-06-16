@@ -8,7 +8,7 @@ Feature: Pickup - Cross-Platform End-to-End Test
     Then Click on "android:id/button2" button
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
     Then Enter "11223344" as password

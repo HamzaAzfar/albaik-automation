@@ -14,9 +14,7 @@ Then(/^the restaurant panel is loaded and ready$/, async () => {
 
 
 
-Then(/^wait for "(\d+)" seconds in web$/, async (seconds: string) => {
-    await commonWebPage.WaitForSecondsWeb(parseInt(seconds));
-});
+
 
 Then(/^Click on web Button with "([^"]*)"$/, async (href: string) => {
     await commonWebPage.ClickWebLinkByHref(href);
@@ -52,4 +50,8 @@ Then(/^Enter "([^"]*)" into "([^"]*)" Input web$/, async (text: string, inputNam
 
 Then(/^Verify "([^"]*)" text on web$/, async (text: string) => {
     await commonWebPage.VerifyTextOnWeb(text);
+});
+
+Then(/^Disable quick register feature flag in admin panel$/, async () => {
+    await commonWebPage.DisableQuickRegisterFeature();
 });

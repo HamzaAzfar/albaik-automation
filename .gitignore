@@ -8,8 +8,11 @@ apps/*.apk
 apps/*.aab
 inspector-output/
 actions-runner/
+.env
+
 
 # Test Reports
 cucumber-json-reports/
 cucumber-html-reports/
 *.zip
+screenshots/

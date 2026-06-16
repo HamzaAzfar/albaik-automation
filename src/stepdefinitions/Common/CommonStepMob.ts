@@ -1,4 +1,5 @@
 import { CommonFunctionPage, Then, When, Given } from '../../pages/Common/CommonPageMob';
+import { DataStore } from '../../services/DataStore';
 
 
 const commonFunctionPage = new CommonFunctionPage();
@@ -20,6 +21,10 @@ Then('Verify that the {string} text is displayed', async (text: string) => {
 });
 Then('wait untill {string} text is displayed', async (text: string) => {
   await commonFunctionPage.WaitUntilTxtDisplayed(text);
+});
+
+Then(/^Verify any Arabic text is displayed on the screen$/, async () => {
+  await commonFunctionPage.VerifyAnyArabicTextDisplayed();
 });
 
 
@@ -75,6 +80,15 @@ Then(/^Hit "([^"]*)" key$/, async (keyName: string) => {
 
 Then('Turn on Mobile location', async () => {
   await commonFunctionPage.TurnOnMobileLocation();
+});
+
+Then(/^Click on the mobile order card with captured order ID$/, async () => {
+  const orderId = DataStore.get('orderId');
+  if (!orderId) {
+    throw new Error("No captured order ID found in DataStore");
+  }
+  
+  await commonFunctionPage.ClickCapturedOrderCard(orderId);
 });
 
 Then('Kill app and open it again', async () => {

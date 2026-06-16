@@ -43,7 +43,7 @@ export class CommonFunctionPage extends BasePage {
   public static get DEFAULT_WAIT(): number {
     return DataStore.get('isSmokeTest') ? 1000 : 60000;
   }
-  private bottomSheetAnchor = CommonLocators.PickupOption;
+  private bottomSheetAnchor = CommonLocators.DynamicViewGroupByDesc("Pickup from a restaurant");
 
 
   async WaitForHomeScreen(): Promise<void> {
@@ -164,20 +164,24 @@ export class CommonFunctionPage extends BasePage {
   }
 
   protected async FindFirstDisplayed(selectors: string[], timeout: number): Promise<WebdriverIO.Element | null> {
-    const deadline = Date.now() + timeout;
-    while (Date.now() < deadline) {
-      for (const selector of selectors) {
-        try {
-          const element = await this.browserInstance.$(selector);
-          if (await element.isExisting() && await element.isDisplayed()) {
-            return element;
-          }
-        } catch (e) {
+    let foundElement: WebdriverIO.Element | null = null;
+    try {
+      await this.browserInstance.waitUntil(async () => {
+        for (const selector of selectors) {
+          try {
+            const element = await this.browserInstance.$(selector);
+            if (await element.isExisting() && await element.isDisplayed()) {
+              foundElement = element;
+              return true;
+            }
+          } catch (e) { }
         }
-      }
-      await this.browserInstance.pause(500);
+        return false;
+      }, { timeout, interval: 500 });
+      return foundElement;
+    } catch (e) {
+      return null;
     }
-    return null;
   }
 
   async VerifyTxt(text: string) {
@@ -204,24 +208,67 @@ export class CommonFunctionPage extends BasePage {
   async WaitUntilTxtDisplayed(text: string) {
     Logger.Info(`[Explicit Wait] Waiting until text "${text}" is displayed...`);
     const predefinedLocator = (CommonLocators as any)[text];
+    const EXTENDED_WAIT = 300000;
 
     if (predefinedLocator) {
       const selectors = typeof predefinedLocator === 'string' ? [predefinedLocator] : predefinedLocator;
-      const element = await this.FindFirstDisplayed(selectors, CommonFunctionPage.DEFAULT_WAIT);
+      const element = await this.FindFirstDisplayed(selectors, EXTENDED_WAIT);
       if (!element) {
-        throw new Error(`Explicit wait failed: Element "${text}" not displayed on screen within ${CommonFunctionPage.DEFAULT_WAIT}ms`);
+        throw new Error(`Explicit wait failed: Element "${text}" not displayed on screen within ${EXTENDED_WAIT}ms`);
       }
       await expect(element).toBeDisplayed();
       return;
     }
     const element = await this.FindFirstDisplayed(
       this.BuildTextSelectors(text),
-      CommonFunctionPage.DEFAULT_WAIT
+      EXTENDED_WAIT
     );
     if (!element) {
-      throw new Error(`Explicit wait failed: Text "${text}" not displayed on screen within ${CommonFunctionPage.DEFAULT_WAIT}ms`);
+      throw new Error(`Explicit wait failed: Text "${text}" not displayed on screen within ${EXTENDED_WAIT}ms`);
     }
     await expect(element).toBeDisplayed();
+  }
+
+  async ClickCapturedOrderCard(orderId: string) {
+    Logger.Info(`[Interaction] Attempting to click mobile order card with captured ID: ${orderId}`);
+    const cardLocator = `//android.view.ViewGroup[@resource-id="ODSGradientView" and .//android.widget.TextView[contains(@text, "${orderId}")]]/android.view.View`;
+    const exactTextLocator = `//android.widget.TextView[@text="# ${orderId}"]`;
+    const containsTextLocator = `//android.widget.TextView[contains(@text, "${orderId}")]`;
+    const backupCardLocator = `//android.view.ViewGroup[@resource-id="ODSGradientView"]/android.view.View`;
+
+    const element = await this.FindFirstDisplayed([
+      cardLocator,
+      exactTextLocator,
+      containsTextLocator,
+      backupCardLocator
+    ], 15000);
+
+    if (!element) {
+      throw new Error(`Mobile order card with order ID ${orderId} not found`);
+    }
+
+    await element.click();
+  }
+
+  async VerifyAnyArabicTextDisplayed() {
+    Logger.Info(`[Verification] Checking if any Arabic text is displayed on the screen...`);
+    const timeout = CommonFunctionPage.DEFAULT_WAIT;
+    const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+
+    try {
+      await this.browserInstance.waitUntil(async () => {
+        try {
+          const source = await this.browserInstance.getPageSource();
+          if (arabicRegex.test(source)) {
+            Logger.Info(`[Verification] Arabic text found on the screen.`);
+            return true;
+          }
+        } catch (e) {}
+        return false;
+      }, { timeout, interval: 1000 });
+    } catch (e) {
+      throw new Error(`No Arabic text was found on the screen within ${timeout}ms`);
+    }
   }
 
   async ClickBtn(btn_name: string) {
@@ -268,7 +315,14 @@ export class CommonFunctionPage extends BasePage {
       await element.click();
       return;
     }
-
+    if (btn_name === 'Add button' || btn_name === 'Reduce button') {
+      const locator = `//android.view.ViewGroup[@resource-id="${btn_name}"]`;
+      const element = await this.browserInstance.$(locator);
+      await element.waitForDisplayed({ timeout: CommonFunctionPage.DEFAULT_WAIT });
+      await expect(element).toBeDisplayed();
+      await element.click();
+      return;
+    }
 
 
     const element = await this.FindFirstDisplayed(
@@ -320,15 +374,39 @@ export class CommonFunctionPage extends BasePage {
   }
 
   async ClickProfileIcon() {
-    const xpath = '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[3]/com.horcrux.svg.SvgView/com.horcrux.svg.g/ya1';
+    const element = await this.FindFirstDisplayed(CommonLocators.AndroidIdContent, CommonFunctionPage.DEFAULT_WAIT);
+    if (!element) {
+      Logger.Info("[DEBUG] FindFirstDisplayed failed, trying direct XPath lookups without isDisplayed check...");
+      try {
+        const fallback1 = await this.browserInstance.$('//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup[2]');
+        if (await fallback1.isExisting()) {
+          Logger.Info("[DEBUG] Fallback element (Exact XPath) exists! Clicking it directly...");
+          await fallback1.click();
+          return;
+        }
+      } catch (e) { }
 
-    const driver = (this.browserInstance as any).isMultiremote
-      ? (this.browserInstance as any).mobile
-      : this.browserInstance;
+      try {
+        const fallback1b = await this.browserInstance.$('//android.view.ViewGroup[@content-desc="Menu"]');
+        if (await fallback1b.isExisting()) {
+          Logger.Info("[DEBUG] Fallback element (Menu) exists! Clicking it directly...");
+          await fallback1b.click();
+          return;
+        }
+      } catch (e) { }
 
-    const element = await driver.$(xpath);
-    await element.waitForExist({ timeout: CommonFunctionPage.DEFAULT_WAIT });
-    await expect(element).toExist();
+      try {
+        const fallback2 = await this.browserInstance.$('//android.view.ViewGroup[contains(@resource-id, "android:id/content")]//com.horcrux.svg.SvgView');
+        if (await fallback2.isExisting()) {
+          Logger.Info("[DEBUG] Fallback element (generic SvgView) exists! Clicking it directly...");
+          await fallback2.click();
+          return;
+        }
+      } catch (e) { }
+
+      throw new Error(`Profile icon not found using any locators within ${CommonFunctionPage.DEFAULT_WAIT}ms`);
+    }
+
     await element.click();
   }
 

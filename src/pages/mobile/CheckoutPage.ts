@@ -83,7 +83,11 @@ class CheckoutPage extends CommonFunctionPage {
     let actualLocator = (CommonLocators as any)[locatorKey] || locatorKey;
     Logger.Info(`[captureAndStoreAmount] Using locator: ${actualLocator}`);
 
-    await this.browserInstance.pause(1000);
+    try {
+      await this.browserInstance.$(actualLocator).waitForExist({ timeout: 5000 });
+    } catch (e) {
+      Logger.Warn(`[captureAndStoreAmount] Element ${actualLocator} did not exist within 5000ms`);
+    }
 
     let elements = await driver.$$(actualLocator);
     Logger.Info(`[captureAndStoreAmount] Found ${elements.length} elements with locator`);

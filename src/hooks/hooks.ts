@@ -1,4 +1,4 @@
-import { AfterStep, AfterAll, Before, setDefinitionFunctionWrapper } from '@cucumber/cucumber';
+import { AfterStep, AfterAll, Before, After, setDefinitionFunctionWrapper } from '@cucumber/cucumber';
 import { DataStore } from '../services/DataStore';
 
 let passed = 0;
@@ -6,7 +6,27 @@ let failed = 0;
 let skipped = 0;
 let isSmokeTest = false;
 
+import { Logger } from '../utils/Logger';
 
+Before(async function (scenario) {
+  Logger.Info(`\n--- Starting Scenario: ${scenario.pickle.name} ---`);
+  DataStore.clear();
+});
+
+After(async function (scenario) {
+  Logger.Info(`--- Finished Scenario: ${scenario.pickle.name} | Status: ${scenario.result?.status} ---\n`);
+
+  if (scenario.result?.status === 'FAILED') {
+    try {
+      if (typeof browser !== 'undefined') {
+        const screenshot = await browser.takeScreenshot();
+        this.attach(screenshot, 'image/png');
+      }
+    } catch (e) {
+      Logger.Warn(`Failed to capture screenshot in After hook: ${e}`);
+    }
+  }
+});
 
 setDefinitionFunctionWrapper(function (fn: any) {
   const wrapper = async function (this: any, ...args: any[]) {

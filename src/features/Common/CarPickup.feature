@@ -9,7 +9,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on "android:id/button2" button
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
@@ -60,7 +60,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on "android:id/button2" button
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
@@ -100,6 +100,23 @@ Feature: Verify that the curbside order works as expected
     Then Hit "Enter" key in web
     Then Click on the order with captured order ID
 
+  @Regression @TC_Regression_Car-Pickup_003 @Test
+  Scenario: Verify that the car pickup with the QR code is working fine.
+    Given The Albaik application is launched on physical device
+    Then Click on "android:id/button2" button
+    Then Click on "Saudi Arabia" button
+    Then Click on "android:id/button2" button
+    Then Verify that the "Skip" text is displayed
+    Then Click on "Skip" button
+    Then Click on profile icon
+    Then I sign out if already signed in
+    Then Click on "Sign In" button
+    Then Enter "532255875" into "5XXXXXXXX" Input
+    Then Enter "11223344" as password
+    Then Click on "Sign In" button
+    And I navigate to deep link "albaik://curbside/37" to bypass QR scan
+    Then Verify any Arabic text is displayed on the screen
+
   @Regression @TC_Regression_Car-Pickup_004
   Scenario: Verify after placing and paying for the order, the app allows the customer to cancel the order within 2 minutes.
     Then Click on "android:id/button2" button
@@ -109,7 +126,7 @@ Feature: Verify that the curbside order works as expected
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
     Then Verify that the "android:id/content" text is displayed
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Verify that the "Sign In" text is displayed
     Then Click on "Sign In" button
@@ -156,7 +173,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on "android:id/button2" button
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
@@ -211,7 +228,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on "android:id/button2" button
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
@@ -259,6 +276,70 @@ Feature: Verify that the curbside order works as expected
     Then Click on web Button with "Assign Order"
     Then Click on web Button with "Deliver Order"
 
+  @Regression @TC_Regression_Car-Pickup_007 @Test
+  Scenario: Verify that the system shows a message to the customer on the ODS "To help us find you, please turn on your hazard lights" when TM scans the yellow receipt/Enters the order number.
+    Then Click on "android:id/button2" button
+    Then Click on "Saudi Arabia" button
+    Then navigate to the curbside web panel
+    Then Click on "android:id/button2" button
+    Then Verify that the "Skip" text is displayed
+    Then Click on "Skip" button
+    Then Click on profile icon
+    Then I sign out if already signed in
+    Then Click on "Sign In" button
+    Then Enter "532255875" into "5XXXXXXXX" Input
+    Then Enter "11223344" as password
+    Then Click on "Sign In" button
+    Then Click on "ChannelPicker" button
+    Then Click on "Pickup from a restaurant" button
+    Then Click on "Choose a restaurant" button
+    Then Click on "Search manually" button
+    Then Enter "ktm" into "City, Branch" Input
+    Then Hit "Enter" key
+    Then Click on "KTM Test Branch" button
+    Then Click on "bring it to my car" button
+    Then Click on "Order Here" button until it disappears
+    Then Scroll "down" until "moon" text is displayed
+    Then Click on "moon" button
+    Then Click on "Add to order" button
+    Then Click on "View Basket" button
+    Then Click on "Confirm Order" button
+    Then Click on "Choose this car" button
+    Then Click on "Continue" button
+    Then Enter "123" into "checkoutCvv" Input
+    Then Click on "Pay with card" button
+    Then wait untill "#S" text is displayed
+    Then Capture and store order id from tracking card "tracking-curbside"
+    Then Turn on Mobile location
+    Then Click on "I have Arrived" button
+    Then Kill app and open it again
+    Then Verify that the "Skip" text is displayed
+    Then Click on "Skip" button
+    Then Click on the mobile order card with captured order ID
+    Then navigate to the web admin panel
+    Then login to the admin panel
+    Then the restaurant panel is loaded and ready
+    Then Click on web Button with "/admin/orders"
+    Then Enter captured order ID into input field "search"
+    Then Hit "Enter" key in web
+    Then Click on the order with captured order ID
+    Then Click on web Button with "KTM Test Branch"
+    Then Click on web Button with "Restaurant dashboard"
+    Then Enter captured order ID into input field "search"
+    Then Hit "Enter" key in web
+    Then Click on web Button with "Print Receipt & Start Collecting"
+    Then accept web alert
+    Then Click on the order with captured order ID
+    Then Click on web Button with "Prepared"
+    Then navigate to the curbside web panel
+    Then login to the curbside panel with phone "536440699" and password "Kualitatem123"
+    Then Click on web Button with "Assign Order to me"
+    Then Click on web Button with "Assign manually"
+    Then Enter captured order ID into input field "search"
+    Then Verify "Assign Order" text on web
+    Then Click on web Button with "Assign Order"
+    Then Verify that the "To help us find you, please turn on your hazard lights" text is displayed
+
   @Regression @TC_Regression_Car-Pickup_010
   Scenario: Verify that when the user does not select the 'Bring to My car' option, the order will be treated as a simple Pickup.
     Then Click on "android:id/button2" button
@@ -266,7 +347,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on "android:id/button2" button
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
@@ -290,7 +371,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on "android:id/button2" button
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
@@ -340,7 +421,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on "android:id/button2" button
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
@@ -366,7 +447,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on "android:id/button2" button
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
@@ -400,7 +481,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on "android:id/button2" button
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
@@ -437,7 +518,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on "android:id/button2" button
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
@@ -474,7 +555,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on "android:id/button2" button
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
@@ -508,7 +589,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on "android:id/button2" button
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
@@ -551,7 +632,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on "android:id/button2" button
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
@@ -580,7 +661,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on "android:id/button2" button
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
@@ -612,7 +693,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on "android:id/button2" button
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then I sign out if already signed in
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input

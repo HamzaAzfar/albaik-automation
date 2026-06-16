@@ -5,7 +5,7 @@ Feature: Delivery - Cross-Platform End-to-End Test
     Given The Albaik application is launched on physical device
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
     Then Enter "11223344" as password
@@ -59,7 +59,7 @@ Feature: Delivery - Cross-Platform End-to-End Test
     Given The Albaik application is launched on physical device
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
     Then Enter "11223344" as password
@@ -78,7 +78,7 @@ Feature: Delivery - Cross-Platform End-to-End Test
     Given The Albaik application is launched on physical device
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
     Then Enter "11223344" as password
@@ -140,7 +140,7 @@ Feature: Delivery - Cross-Platform End-to-End Test
     Given The Albaik application is launched on physical device
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
     Then Enter "11223344" as password
@@ -200,7 +200,7 @@ Feature: Delivery - Cross-Platform End-to-End Test
     Given The Albaik application is launched on physical device
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
     Then Enter "11223344" as password
@@ -261,7 +261,7 @@ Feature: Delivery - Cross-Platform End-to-End Test
     Given The Albaik application is launched on physical device
     Then Verify that the "Skip" text is displayed
     Then Click on "Skip" button
-    Then Click on "android:id/content" button
+    Then Click on profile icon
     Then Click on "Sign In" button
     Then Enter "532255875" into "5XXXXXXXX" Input
     Then Enter "11223344" as password
