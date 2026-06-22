@@ -1,5 +1,6 @@
 import { AfterStep, AfterAll, Before, After, setDefinitionFunctionWrapper } from '@cucumber/cucumber';
 import { DataStore } from '../services/DataStore';
+import { WebSessionManager } from '../services/WebSessionManager';
 
 let passed = 0;
 let failed = 0;
@@ -8,11 +9,27 @@ let isSmokeTest = false;
 
 import { Logger } from '../utils/Logger';
 
-Before(async function (scenario) {
-  Logger.Info(`\n--- Starting Scenario: ${scenario.pickle.name} ---`);
-  DataStore.clear();
-});
+// Before(async function (scenario) {
+//   Logger.Info(`\n--- Starting Scenario: ${scenario.pickle.name} ---`);
+//   DataStore.clear();
+// });
+Before(function (scenario: any) {
+  DataStore.clear(); // Wipe state before every scenario to prevent cross-test contamination
+  const uri = scenario.pickle?.uri || scenario.uri || '';
+  const tags = scenario.pickle?.tags ? scenario.pickle.tags.map((t: any) => t.name) : [];
 
+  // Check if it's running the smoke feature file, carpickup feature file, or if the scenario has related tags
+  const isSmoke = uri.toLowerCase().includes('Tuesday') || tags.includes('@Tuesday');
+  // const isCarPickup = uri.toLowerCase().includes('carpickup') || tags.some((t: string) => t.toLowerCase().includes('carpickup') || t.toLowerCase().includes('car-pickup'));
+
+  if (isSmoke) {
+    isSmokeTest = true;
+    DataStore.set('isSmokeTest', true);
+  } else {
+    isSmokeTest = false;
+    DataStore.set('isSmokeTest', false);
+  }
+});
 After(async function (scenario) {
   Logger.Info(`--- Finished Scenario: ${scenario.pickle.name} | Status: ${scenario.result?.status} ---\n`);
 
@@ -26,16 +43,17 @@ After(async function (scenario) {
       Logger.Warn(`Failed to capture screenshot in After hook: ${e}`);
     }
   }
+
+  // Terminate any standalone browser session opened during this scenario
+  await WebSessionManager.terminate();
 });
 
 setDefinitionFunctionWrapper(function (fn: any) {
   const wrapper = async function (this: any, ...args: any[]) {
-
-
     let timeoutId: NodeJS.Timeout;
     try {
       const timeoutPromise = new Promise((_, reject) => {
-        timeoutId = setTimeout(() => reject(new Error("Step execution exceeded 230s falling back to other locator.")), 230000);
+        timeoutId = setTimeout(() => reject(new Error('Step execution exceeded 90s timeout.')), 90000);
       });
       const result = await Promise.race([fn.apply(this, args), timeoutPromise]);
       clearTimeout(timeoutId!);

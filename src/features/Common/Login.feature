@@ -5,7 +5,7 @@ Feature: Login/Registration
     Scenario: Verify that the user is able to enter the mobile number on the login page.
         Then navigate to the web admin panel
         Then login to the admin panel
-        Then Disable quick register feature flag in admin panel
+        Then "disable" flag of "enableQuickRegister" in admin panel
         Given The Albaik application is launched on physical device
         Then Verify that the "Skip" text is displayed
         Then Click on "Skip" button
@@ -26,7 +26,7 @@ Feature: Login/Registration
     Scenario: Verify that the user is able to enter a password on the login page.
         Then navigate to the web admin panel
         Then login to the admin panel
-        Then Disable quick register feature flag in admin panel
+        Then "disable" flag of "enableQuickRegister" in admin panel
         Given The Albaik application is launched on physical device
         Then Verify that the "Skip" text is displayed
         Then Click on "Skip" button
@@ -120,7 +120,7 @@ Feature: Login/Registration
     Scenario: Verify that the user is able to enter the "first name" on the registration page.
         Then navigate to the web admin panel
         Then login to the admin panel
-        Then Disable quick register feature flag in admin panel
+        Then "disable" flag of "enableQuickRegister" in admin panel
         Given The Albaik application is launched on physical device
         Then Verify that the "Skip" text is displayed
         Then Click on "Skip" button
@@ -133,7 +133,7 @@ Feature: Login/Registration
     Scenario: Verify that the user is able to enter the "last name" on the registration page.
         Then navigate to the web admin panel
         Then login to the admin panel
-        Then Disable quick register feature flag in admin panel
+        Then "disable" flag of "enableQuickRegister" in admin panel
         Given The Albaik application is launched on physical device
         Then Verify that the "Skip" text is displayed
         Then Click on "Skip" button
@@ -156,7 +156,7 @@ Feature: Login/Registration
     Scenario: Verify that the user is able to enter the "email address" on the registration page.
         Then navigate to the web admin panel
         Then login to the admin panel
-        Then Disable quick register feature flag in admin panel
+        Then "disable" flag of "enableQuickRegister" in admin panel
         Given The Albaik application is launched on physical device
         Then Verify that the "Skip" text is displayed
         Then Click on "Skip" button
@@ -179,7 +179,7 @@ Feature: Login/Registration
     Scenario: Verify that the "Register" button is functional.
         Then navigate to the web admin panel
         Then login to the admin panel
-        Then Disable quick register feature flag in admin panel
+        Then "disable" flag of "enableQuickRegister" in admin panel
         Given The Albaik application is launched on physical device
         Then Verify that the "Skip" text is displayed
         Then Click on "Skip" button

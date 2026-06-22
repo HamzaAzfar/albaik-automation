@@ -86,7 +86,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on "Pay with card" button
     Then wait untill "#S" text is displayed
     Then Capture and store order id from tracking card "tracking-curbside"
-    Then Turn on Mobile location
+    Then Turn "on" Mobile location
     Then Click on "I have Arrived" button
     Then Kill app and open it again
     Then Verify that the "Skip" text is displayed
@@ -100,7 +100,7 @@ Feature: Verify that the curbside order works as expected
     Then Hit "Enter" key in web
     Then Click on the order with captured order ID
 
-  @Regression @TC_Regression_Car-Pickup_003 @Test
+  @Regression @TC_Regression_Car-Pickup_003
   Scenario: Verify that the car pickup with the QR code is working fine.
     Given The Albaik application is launched on physical device
     Then Click on "android:id/button2" button
@@ -199,7 +199,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on "Pay with card" button
     Then wait untill "#S" text is displayed
     Then Capture and store order id from tracking card "tracking-curbside"
-    Then Turn on Mobile location
+    Then Turn "on" Mobile location
     Then Click on "I have Arrived" button
     Then Kill app and open it again
     Then Verify that the "Skip" text is displayed
@@ -254,7 +254,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on "Pay with card" button
     Then wait untill "#S" text is displayed
     Then Capture and store order id from tracking card "tracking-curbside"
-    Then Turn on Mobile location
+    Then Turn "on" Mobile location
     Then Click on "I have Arrived" button
     Then Kill app and open it again
     Then Verify that the "Skip" text is displayed
@@ -276,7 +276,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on web Button with "Assign Order"
     Then Click on web Button with "Deliver Order"
 
-  @Regression @TC_Regression_Car-Pickup_007 @Test
+  @Regression @TC_Regression_Car-Pickup_007
   Scenario: Verify that the system shows a message to the customer on the ODS "To help us find you, please turn on your hazard lights" when TM scans the yellow receipt/Enters the order number.
     Then Click on "android:id/button2" button
     Then Click on "Saudi Arabia" button
@@ -310,7 +310,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on "Pay with card" button
     Then wait untill "#S" text is displayed
     Then Capture and store order id from tracking card "tracking-curbside"
-    Then Turn on Mobile location
+    Then Turn "on" Mobile location
     Then Click on "I have Arrived" button
     Then Kill app and open it again
     Then Verify that the "Skip" text is displayed
@@ -507,7 +507,7 @@ Feature: Verify that the curbside order works as expected
     Then Click on "Pay with card" button
     Then wait untill "#S" text is displayed
     Then Capture and store order id from tracking card "tracking-curbside"
-    Then Turn on Mobile location
+    Then Turn "on" Mobile location
     Then Click on "I have Arrived" button
     Then Kill app and open it again
 
@@ -543,7 +543,7 @@ Feature: Verify that the curbside order works as expected
     Then Enter "123" into "checkoutCvv" Input
     Then Click on "Pay with card" button
     Then wait untill "#S" text is displayed
-    Then Turn on Mobile location
+    Then Turn "on" Mobile location
     Then Click on "I have Arrived" button
     Then Click on "WhatsApp" button
     Then Click on "Call" button

@@ -1,7 +1,5 @@
 export async function hideKeyboard(): Promise<void> {
-
   await browser.hideKeyboard();
-
 }
 
 export async function launchApp(): Promise<void> {

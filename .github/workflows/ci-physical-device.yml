@@ -2,7 +2,7 @@ name: Albaik Automation CI/CD Pipeline
 
 on:
   push:
-    branches: [ "master", "main", "talha-automation", "hamza-automation" ]
+    branches: [ "master", "main" ]
   pull_request:
     branches: [ "master", "main" ]
   workflow_dispatch:
@@ -27,6 +27,8 @@ jobs:
   execute-automation-tests:
     name: Execute E2E Tests on Physical Device
     runs-on: self-hosted
+    env:
+      TARGET_UDID: ''
 
     steps:
       - name: Checkout Repository
@@ -92,6 +94,14 @@ jobs:
         with:
           name: cucumber-html-report
           path: cucumber-html-reports
+          retention-days: 14
+
+      - name: Upload Allure Results Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-results
+          path: allure-results
           retention-days: 14
 
       - name: Zip Cucumber Report for Email

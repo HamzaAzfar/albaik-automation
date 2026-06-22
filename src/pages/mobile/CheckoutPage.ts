@@ -1,49 +1,52 @@
 import { CommonFunctionPage } from '../Common/CommonPageMob';
 import { Logger } from '../../utils/Logger';
-import { CommonLocators } from '../../locators/Common/CommonLocator';
+import { MobileLocators } from '../../locators/Mobile/MobileLocator';
+import { WebLocators } from '../../locators/Web/WebLocator';
+import { DriverLocators } from '../../locators/Driver/DriverLocator';
+
+const CommonLocators = { ...MobileLocators, ...WebLocators, ...DriverLocators };
 import { DataStore } from '../../services/DataStore';
 
 class CheckoutPage extends CommonFunctionPage {
-
   async HandleDynamicCheckout(cvv: string) {
-    Logger.Info("[Dynamic Checkout] Checking which checkout layout is currently active...");
+    Logger.Info('[Dynamic Checkout] Checking which checkout layout is currently active...');
     try {
-
-      const continueSelectors = this.BuildTextSelectors("Continue");
+      const continueSelectors = this.BuildTextSelectors('Continue');
       const element = await this.FindFirstDisplayed(continueSelectors, 10000);
 
       if (!element) {
-        throw new Error("Continue button not found, assuming previous layout.");
+        throw new Error('Continue button not found, assuming previous layout.');
       }
 
       await element.click();
 
-      const cvvLocator = CommonLocators.DynamicTextInput("checkoutCvv");
+      const cvvLocator = CommonLocators.DynamicTextInput('checkoutCvv');
       const cvvElement = await this.browserInstance.$(cvvLocator);
       await cvvElement.waitForDisplayed({ timeout: 15000 });
       await expect(cvvElement).toBeDisplayed();
 
-      await this.EnterTextInInputField(cvv, "checkoutCvv");
-      await this.ClickBtn("Pay with card");
-      Logger.Info("[Dynamic Checkout] Successfully executed the ORIGINAL UPDATED checkout flow.");
-
+      await this.EnterTextInInputField(cvv, 'checkoutCvv');
+      await this.ClickBtn('Pay with card');
+      Logger.Info('[Dynamic Checkout] Successfully executed the ORIGINAL UPDATED checkout flow.');
     } catch (error: any) {
       Logger.Info(`[Dynamic Checkout] Updated layout not detected. Error: ${error.message}`);
-      Logger.Info("[Dynamic Checkout] Falling back to the OTHER PREVIOUS checkout layout...");
+      Logger.Info('[Dynamic Checkout] Falling back to the OTHER PREVIOUS checkout layout...');
 
       const cardName = process.env.TEST_CARD_NAME || '';
       const cardNumber = process.env.TEST_CARD_NUMBER || '';
       const cardExpiry = process.env.TEST_CARD_EXPIRY || '';
 
       if (!cardName || !cardNumber || !cardExpiry) {
-        throw new Error("Test card details missing. Please set TEST_CARD_NAME, TEST_CARD_NUMBER, and TEST_CARD_EXPIRY in your .env file");
+        throw new Error(
+          'Test card details missing. Please set TEST_CARD_NAME, TEST_CARD_NUMBER, and TEST_CARD_EXPIRY in your .env file',
+        );
       }
 
-      await this.ClickBtn("Credit / Debit");
-      await this.EnterTextInInputField(cardName, "card_holder_name_input");
-      await this.EnterTextInInputField(cardNumber, "card_number_input");
-      await this.EnterTextInInputField(cardExpiry, "expiry_date_input");
-      await this.EnterTextInInputField(cvv, "cvv_input");
+      await this.ClickBtn('Credit / Debit');
+      await this.EnterTextInInputField(cardName, 'card_holder_name_input');
+      await this.EnterTextInInputField(cardNumber, 'card_number_input');
+      await this.EnterTextInInputField(cardExpiry, 'expiry_date_input');
+      await this.EnterTextInInputField(cvv, 'cvv_input');
     }
   }
 
@@ -80,7 +83,7 @@ class CheckoutPage extends CommonFunctionPage {
     DataStore.set(key, undefined);
     Logger.Info(`[captureAndStoreAmount] Cleared old value for key: "${key}" (was: "${oldValue}")`);
 
-    let actualLocator = (CommonLocators as any)[locatorKey] || locatorKey;
+    const actualLocator = (CommonLocators as any)[locatorKey] || locatorKey;
     Logger.Info(`[captureAndStoreAmount] Using locator: ${actualLocator}`);
 
     try {
@@ -89,14 +92,14 @@ class CheckoutPage extends CommonFunctionPage {
       Logger.Warn(`[captureAndStoreAmount] Element ${actualLocator} did not exist within 5000ms`);
     }
 
-    let elements = await driver.$$(actualLocator);
+    const elements = await driver.$$(actualLocator);
     Logger.Info(`[captureAndStoreAmount] Found ${elements.length} elements with locator`);
 
     if (elements.length === 0) {
       throw new Error(`Could not find any element with locator: ${actualLocator}`);
     }
 
-    const visibleAmounts: Array<{ text: string, value: number, index: number }> = [];
+    const visibleAmounts: Array<{ text: string; value: number; index: number }> = [];
 
     for (let i = 0; i < elements.length; i++) {
       try {
@@ -124,7 +127,9 @@ class CheckoutPage extends CommonFunctionPage {
     const largestAmount = visibleAmounts[0];
 
     DataStore.set(key, largestAmount.text);
-    Logger.Info(`[captureAndStoreAmount] Captured LARGEST visible amount: "${largestAmount.text}" (${largestAmount.value}) from element [${largestAmount.index}] and stored as key: "${key}"`);
+    Logger.Info(
+      `[captureAndStoreAmount] Captured LARGEST visible amount: "${largestAmount.text}" (${largestAmount.value}) from element [${largestAmount.index}] and stored as key: "${key}"`,
+    );
   }
 
   async CompareStoredAmounts(key1: string, key2: string) {

@@ -1,10 +1,9 @@
-
-
 import { config as dotenvConfig } from 'dotenv';
 
 import { execSync } from 'child_process';
 
 import fs from 'fs';
+import fsPromises from 'fs/promises';
 
 import path from 'path';
 
@@ -13,15 +12,9 @@ import cucumberJson from 'wdio-cucumberjs-json-reporter';
 
 import { getCapabilities } from './config/capabilities';
 
-
-
 dotenvConfig();
 
-
-
 process.env.ANDROID_SDK_ROOT = process.env.ANDROID_SDK_ROOT || process.env.ANDROID_HOME;
-
-
 
 const TEST_PLATFORM = process.env.TEST_PLATFORM?.toLowerCase() || 'mobile';
 const isCrossPlatform = TEST_PLATFORM === 'cross-platform';
@@ -29,39 +22,26 @@ const isDualMobile = TEST_PLATFORM === 'dual-mobile';
 const isFullDelivery = TEST_PLATFORM === 'full-delivery';
 const isWeb = TEST_PLATFORM === 'web';
 
-const testSpecs = (isDualMobile || isFullDelivery)
-  ? ['./src/features/Common/**/*.feature']
-  : isCrossPlatform
-    ? ['./src/features/Common/**/*.feature']
-    : isWeb
-      ? ['./src/features/Common/**/*.feature']
-      : ['./src/features/Common/**/*.feature'];
+const testSpecs = ['./src/features/Common/**/*.feature'];
 
-const stepDefinitionFiles = (isDualMobile || isFullDelivery)
-  ? [
-    './src/hooks/**/*.ts',
-    './src/stepdefinitions/**/*.ts',
-  ]
-  : isCrossPlatform
-    ? [
-      './src/hooks/**/*.ts',
-      './src/stepdefinitions/**/*.ts',
-    ]
-    : isWeb
-      ? [
-        './src/hooks/**/*.ts',
-        './src/stepdefinitions/Common/CommonStepWeb.ts',
-        './src/stepdefinitions/Common/**/*.ts',
-        './src/stepdefinitions/web/**/*.ts',
-      ]
-      : [
-        './src/hooks/**/*.ts',
-        './src/stepdefinitions/Common/CommonStepMob.ts',
-        './src/stepdefinitions/Common/**/*.ts',
-        './src/stepdefinitions/mobile/**/*.ts',
-      ];
-
-
+const stepDefinitionFiles =
+  isDualMobile || isFullDelivery
+    ? ['./src/hooks/**/*.ts', './src/stepdefinitions/**/*.ts']
+    : isCrossPlatform
+      ? ['./src/hooks/**/*.ts', './src/stepdefinitions/**/*.ts']
+      : isWeb
+        ? [
+            './src/hooks/**/*.ts',
+            './src/stepdefinitions/Common/CommonStepWeb.ts',
+            './src/stepdefinitions/Common/**/*.ts',
+            './src/stepdefinitions/web/**/*.ts',
+          ]
+        : [
+            './src/hooks/**/*.ts',
+            './src/stepdefinitions/Common/CommonStepMob.ts',
+            './src/stepdefinitions/Common/**/*.ts',
+            './src/stepdefinitions/mobile/**/*.ts',
+          ];
 
 function resolveAppiumPath(): string {
   const isWindows = process.platform === 'win32';
@@ -70,24 +50,15 @@ function resolveAppiumPath(): string {
     const result = execSync(cmd, { encoding: 'utf8' });
 
     return result.trim().split(/\r?\n/)[0].trim();
-
   } catch {
-
     const prefix = execSync('npm config get prefix', { encoding: 'utf8' }).trim();
 
     return isWindows ? path.join(prefix, 'appium.cmd') : path.join(prefix, 'bin', 'appium');
-
   }
-
 }
 
-
-
 export const config: WebdriverIO.Config = {
-
   runner: 'local',
-
-
 
   specs: testSpecs,
 
@@ -98,90 +69,47 @@ export const config: WebdriverIO.Config = {
     scanToOrder: ['./src/features/Common/ScanToOrder.feature'],
   },
 
-
-
   exclude: [
     // No excluded features
   ],
 
-
-
-  maxInstances: (isCrossPlatform || isDualMobile) ? 2 : 1,
-
-
+  maxInstances: parseInt(process.env.MAX_INSTANCES || (isDualMobile ? '2' : '1'), 10),
 
   capabilities: (isFullDelivery
-
     ? {
-
-      customerApp: {
-
-        capabilities: getCapabilities('customer'),
-
-      },
-
-      web: {
-
-        capabilities: getCapabilities('web'),
-
-      },
-
-      driverApp: {
-
-        capabilities: getCapabilities('driver'),
-
-      },
-
-    }
-
-    : isDualMobile
-
-      ? {
-
         customerApp: {
-
           capabilities: getCapabilities('customer'),
+        },
 
+        web: {
+          capabilities: getCapabilities('web'),
         },
 
         driverApp: {
-
           capabilities: getCapabilities('driver'),
-
         },
-
       }
-
-      : isCrossPlatform
-
-        ? {
-
-          mobile: {
-
-            capabilities: getCapabilities('mobile'),
-
+    : isDualMobile
+      ? {
+          customerApp: {
+            capabilities: getCapabilities('customer'),
           },
 
-          web: {
-
-            capabilities: getCapabilities('web'),
-
+          driverApp: {
+            capabilities: getCapabilities('driver'),
           },
-
         }
-
+      : isCrossPlatform
+        ? [getCapabilities('mobile')]
         : [getCapabilities(TEST_PLATFORM)]) as any,
 
+  logLevel: 'warn',
 
-
-
-  logLevel: 'silent',
-
-  onPrepare: function (config, capabilities) {
+  onPrepare: async function (config, capabilities) {
     try {
       let tagExpressionStr = config.cucumberOpts?.tagExpression || '';
       if (!tagExpressionStr) {
-        const tagArg = process.argv.find(arg => arg.startsWith('--cucumberOpts.tagExpression='));
+        const tagArg = process.argv.find((arg) => arg.startsWith('--cucumberOpts.tagExpression='));
         if (tagArg) {
           tagExpressionStr = tagArg.split('=')[1];
         } else {
@@ -197,27 +125,30 @@ export const config: WebdriverIO.Config = {
         try {
           const tagExprParser = require('@cucumber/tag-expressions').default;
           expressionNode = tagExprParser(tagExpressionStr);
-        } catch (e) { console.log('Tag parse error', e); }
+        } catch (e) {
+          console.log('Tag parse error', e);
+        }
       }
 
-      function getFeatureFiles(dir: string, fileList: string[] = []) {
-        const files = fs.readdirSync(dir);
+      async function getFeatureFiles(dir: string, fileList: string[] = []) {
+        const files = await fsPromises.readdir(dir);
         for (const file of files) {
           const filePath = path.join(dir, file);
-          if (fs.statSync(filePath).isDirectory()) {
-            getFeatureFiles(filePath, fileList);
+          const stat = await fsPromises.stat(filePath);
+          if (stat.isDirectory()) {
+            await getFeatureFiles(filePath, fileList);
           } else if (filePath.endsWith('.feature')) {
             fileList.push(filePath);
           }
         }
         return fileList;
       }
-      const featureFiles = getFeatureFiles(path.join(process.cwd(), 'src', 'features', 'Common'));
+      const featureFiles = await getFeatureFiles(path.join(process.cwd(), 'src', 'features', 'Common'));
       let totalScenarios = 0;
       let totalSteps = 0;
 
       for (const file of featureFiles) {
-        const content = fs.readFileSync(file, 'utf-8');
+        const content = await fsPromises.readFile(file, 'utf-8');
         const lines = content.split('\n');
 
         let featureTags: string[] = [];
@@ -280,11 +211,11 @@ export const config: WebdriverIO.Config = {
     }
 
     try {
-      const files = fs.readdirSync(process.cwd()).filter(f => f.startsWith('test-summary-') && f.endsWith('.json'));
+      const files = fs.readdirSync(process.cwd()).filter((f) => f.startsWith('test-summary-') && f.endsWith('.json'));
       for (const file of files) {
         fs.unlinkSync(path.join(process.cwd(), file));
       }
-    } catch (e) { }
+    } catch (e) {}
   },
 
   onComplete: function () {
@@ -294,7 +225,7 @@ export const config: WebdriverIO.Config = {
       let totalStepsPassed = 0;
       let totalStepsFailed = 0;
 
-      const files = fs.readdirSync(process.cwd()).filter(f => f.startsWith('test-summary-') && f.endsWith('.json'));
+      const files = fs.readdirSync(process.cwd()).filter((f) => f.startsWith('test-summary-') && f.endsWith('.json'));
       for (const file of files) {
         try {
           const data = JSON.parse(fs.readFileSync(path.join(process.cwd(), file), 'utf8'));
@@ -303,7 +234,7 @@ export const config: WebdriverIO.Config = {
           totalStepsPassed += data.stepsPassed || 0;
           totalStepsFailed += data.stepsFailed || 0;
           fs.unlinkSync(path.join(process.cwd(), file));
-        } catch (e) { }
+        } catch (e) {}
       }
 
       console.log(`\n==================================================`);
@@ -313,7 +244,7 @@ export const config: WebdriverIO.Config = {
       console.log(`   Steps Passed     : ${totalStepsPassed}`);
       console.log(`   Steps Failed     : ${totalStepsFailed}`);
       console.log(`==================================================\n`);
-    } catch (e) { }
+    } catch (e) {}
 
     try {
       execSync('npx tsx scripts/generate-cucumber-report.ts', { stdio: 'inherit' });
@@ -323,7 +254,11 @@ export const config: WebdriverIO.Config = {
       if (!process.env.CI) {
         const isWindows = process.platform === 'win32';
         const openCmd = isWindows ? 'start' : process.platform === 'darwin' ? 'open' : 'xdg-open';
-        execSync(`${openCmd} cucumber-html-reports/index.html`);
+        if (fs.existsSync('cucumber-html-reports/index.html')) {
+          execSync(`${openCmd} cucumber-html-reports/index.html`);
+        } else {
+          console.log('Skipping auto-open: cucumber-html-reports/index.html not found.');
+        }
       }
     } catch (e) {
       console.error('Could not generate Cucumber HTML report:', e);
@@ -338,56 +273,33 @@ export const config: WebdriverIO.Config = {
 
   waitforTimeout: 30000,
 
+  connectionRetryTimeout: 30000,
 
-
-
-  connectionRetryTimeout: 240000,
-
-
-
-  connectionRetryCount: parseInt(process.env.CONNECTION_RETRY_COUNT || '3', 10),
-
-
+  connectionRetryCount: parseInt(process.env.CONNECTION_RETRY_COUNT || '1', 10),
 
   services: [
-
     [
-
       'appium',
 
       {
-
         command: resolveAppiumPath(),
 
         args: {
-
           relaxedSecurity: true,
 
           log: './appium.log',
-
         },
-
       },
-
     ],
-
   ],
-
-
 
   framework: 'cucumber',
 
-
-
   reporters: [
-
-
     [
-
       'allure',
 
       {
-
         outputDir: 'allure-results',
 
         disableWebdriverStepsReporting: true,
@@ -397,43 +309,48 @@ export const config: WebdriverIO.Config = {
         useCucumberStepReporter: true,
 
         addConsoleLogs: true,
-
       },
-
     ],
 
-    ['cucumberjs-json', {
-      jsonFolder: 'cucumber-json-reports',
-      language: 'en',
-    }],
-
+    [
+      'cucumberjs-json',
+      {
+        jsonFolder: 'cucumber-json-reports',
+        language: 'en',
+      },
+    ],
   ],
 
   beforeScenario: function (world, context) {
     console.log(`\n▶ Scenario: ${world.pickle.name}`);
   },
 
-
   afterStep: async function (step, scenario, result, context) {
+    // F-14 fix: Use in-memory cache instead of sync file I/O on every step
     const summaryFile = path.join(process.cwd(), `test-summary-${process.pid}.json`);
-    let summary = { scenariosPassed: 0, scenariosFailed: 0, stepsPassed: 0, stepsFailed: 0 };
-    if (fs.existsSync(summaryFile)) {
-      try { summary = JSON.parse(fs.readFileSync(summaryFile, 'utf8')); } catch (e) { }
+    if (!(global as any).__testSummary) {
+      (global as any).__testSummary = { scenariosPassed: 0, scenariosFailed: 0, stepsPassed: 0, stepsFailed: 0 };
     }
+    const summary = (global as any).__testSummary;
     if (result.passed) {
       summary.stepsPassed++;
       console.log(`   \x1b[32m✔\x1b[0m ${step.text}`);
     } else {
       summary.stepsFailed++;
       console.log(`   \x1b[31m✖\x1b[0m ${step.text} \x1b[31m(FAILED)\x1b[0m`);
+      if (result.error) {
+        console.log(`      \x1b[31mError:\x1b[0m ${(result.error as any).message || result.error}`);
+      }
     }
-    fs.writeFileSync(summaryFile, JSON.stringify(summary));
+    // Write to disk only every 10 steps to reduce I/O
+    if ((summary.stepsPassed + summary.stepsFailed) % 10 === 0) {
+      fsPromises.writeFile(summaryFile, JSON.stringify(summary)).catch(() => {});
+    }
 
     if (!result.passed) {
       try {
         const screenshot = await browser.takeScreenshot();
         if (typeof screenshot === 'string') {
-          // Pass the base64 string directly to cucumber JSON
           cucumberJson.attach(screenshot, 'image/png');
         } else if (screenshot && typeof screenshot === 'object') {
           for (const base64Data of Object.values(screenshot)) {
@@ -447,65 +364,47 @@ export const config: WebdriverIO.Config = {
   },
 
   afterScenario: async function (_world, result) {
+    // F-14 fix: Use in-memory cache, flush to disk at scenario boundary
     const summaryFile = path.join(process.cwd(), `test-summary-${process.pid}.json`);
-    let summary = { scenariosPassed: 0, scenariosFailed: 0, stepsPassed: 0, stepsFailed: 0 };
-    if (fs.existsSync(summaryFile)) {
-      try { summary = JSON.parse(fs.readFileSync(summaryFile, 'utf8')); } catch (e) { }
+    if (!(global as any).__testSummary) {
+      (global as any).__testSummary = { scenariosPassed: 0, scenariosFailed: 0, stepsPassed: 0, stepsFailed: 0 };
     }
+    const summary = (global as any).__testSummary;
     if (result.passed) summary.scenariosPassed++;
     else summary.scenariosFailed++;
-    fs.writeFileSync(summaryFile, JSON.stringify(summary));
+    // Flush to disk at end of each scenario (not every step)
+    await fsPromises.writeFile(summaryFile, JSON.stringify(summary)).catch(() => {});
 
     if (!result.passed) {
-
       try {
-
         const screenshot = await browser.takeScreenshot();
 
         if (typeof screenshot === 'string') {
-
           AllureReporter.addAttachment(
-
             'Screenshot on Failure',
 
             Buffer.from(screenshot, 'base64'),
 
-            'image/png'
-
+            'image/png',
           );
-
         } else if (screenshot && typeof screenshot === 'object') {
-
           for (const [browserName, base64Data] of Object.entries(screenshot)) {
-
             AllureReporter.addAttachment(
-
               `Screenshot on Failure - ${browserName}`,
 
               Buffer.from(base64Data as string, 'base64'),
 
-              'image/png'
-
+              'image/png',
             );
-
           }
-
         }
-
       } catch (error) {
-
         console.error('Failed to capture screenshot:', error);
-
       }
-
     }
-
   },
 
-
-
   cucumberOpts: {
-
     require: stepDefinitionFiles,
 
     backtrace: false,
@@ -529,8 +428,5 @@ export const config: WebdriverIO.Config = {
     ignoreUndefinedDefinitions: false,
 
     retry: parseInt(process.env.RETRY_COUNT || '0', 10),
-
-
   },
-
 };

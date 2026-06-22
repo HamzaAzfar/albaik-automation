@@ -1,25 +1,27 @@
 import { CommonFunctionPage } from '../Common/CommonPageMob';
 import { Logger } from '../../utils/Logger';
-import { CommonLocators } from '../../locators/Common/CommonLocator';
+import { MobileLocators } from '../../locators/Mobile/MobileLocator';
+import { WebLocators } from '../../locators/Web/WebLocator';
+import { DriverLocators } from '../../locators/Driver/DriverLocator';
+
+const CommonLocators = { ...MobileLocators, ...WebLocators, ...DriverLocators };
 
 class LoginPage extends CommonFunctionPage {
-
   async SignOutIfSignedIn() {
     try {
-      Logger.Info("Checking if user is already signed in...");
-      const signOutSelectors = this.BuildTextSelectors("Sign out");
+      Logger.Info('Checking if user is already signed in...');
+      const signOutSelectors = this.BuildTextSelectors('Sign out');
       const signOutBtn = await this.FindFirstDisplayed(signOutSelectors, 5000);
 
       if (signOutBtn) {
         await signOutBtn.click();
 
-
-        const menuLocator = CommonLocators.SystemButton("android:id/content");
+        const menuLocator = CommonLocators.SystemButton('android:id/content');
         const menuBtn = await this.browserInstance.$(menuLocator);
         await menuBtn.waitForDisplayed({ timeout: 10000 });
         await expect(menuBtn).toBeDisplayed();
 
-        await this.ClickBtn("android:id/content");
+        await this.ClickBtn('android:id/content');
       } else {
         Logger.Info(" 'Sign out' not found. Assuming user is not signed in.");
       }
@@ -31,7 +33,7 @@ class LoginPage extends CommonFunctionPage {
   async EnterPassword(password?: string) {
     const text = password || process.env.MOBILE_PASSWORD;
     if (!text) {
-      throw new Error("Mobile password missing. Please set MOBILE_PASSWORD in your .env file or pass it to the step.");
+      throw new Error('Mobile password missing. Please set MOBILE_PASSWORD in your .env file or pass it to the step.');
     }
 
     const element = await this.browserInstance.$(CommonLocators.PasswordInput);

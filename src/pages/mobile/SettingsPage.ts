@@ -1,9 +1,8 @@
 import { BasePage } from '../../common/BasePage';
 
 class SettingsPage extends BasePage {
-
   private settingsScreen = 'android=new UiSelector().text("Settings")';
-  private networkOption  = 'android=new UiSelector().text("Network & internet")';
+  private networkOption = 'android=new UiSelector().text("Network & internet")';
 
   byText(text: string): string {
     return `android=new UiSelector().text("${text}")`;

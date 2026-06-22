@@ -1,21 +1,20 @@
 import { DataStore } from '../services/DataStore';
 
 export class BasePage {
-
   protected get browserInstance() {
     if (!browser.isMultiremote) return browser;
-    
+
     // Attempt to pull the current active context from DataStore first
     const ctx = DataStore.get('mobileContext');
     if (ctx && (browser as any)[ctx]) {
       return (browser as any)[ctx];
     }
-    
+
     // Fallback securely to explicit multiremote objects instead of `global`
     if ((browser as any).mobile) return (browser as any).mobile;
     if ((browser as any).customerApp) return (browser as any).customerApp;
     if ((browser as any).web) return (browser as any).web;
-    
+
     return browser;
   }
 
