@@ -1,11 +1,11 @@
-import { Then } from '../../pages/Common/CommonPageMob';
+import { Then, Given, When } from '../../pages/Common/CommonPageMob';
 import CheckoutPage from '../../pages/mobile/CheckoutPage';
 
-Then('Complete dynamic checkout with CVV {string}', async (cvv: string) => {
+When('Complete dynamic checkout with CVV {string}', async (cvv: string) => {
   await CheckoutPage.HandleDynamicCheckout(cvv);
 });
 
-Then('Capture and store order id from tracking card {string}', async (trackingCardId: string) => {
+When('Capture and store order id from tracking card {string}', async (trackingCardId: string) => {
   await CheckoutPage.CaptureAndStoreOrderId(trackingCardId);
 });
 

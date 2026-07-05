@@ -7,7 +7,7 @@ Given('The Albaik application is launched on physical device', async () => {
   await commonFunctionPage.WaitForHomeScreen();
 });
 
-Then('Close the Albaik application on physical device', async () => {
+When('Close the Albaik application on physical device', async () => {
   await commonFunctionPage.CloseCustomerApplication();
 });
 Given('The Albaik Driver application is launched on physical device', async () => {
@@ -25,7 +25,7 @@ Then(/^Verify any Arabic text is displayed on the screen$/, async () => {
   await commonFunctionPage.VerifyAnyArabicTextDisplayed();
 });
 
-Then(/^Click on "([^"]*)" button$/, async (btn_name: string) => {
+When(/^Click on "([^"]*)" button$/, async (btn_name: string) => {
   await commonFunctionPage.ClickBtn(btn_name);
 });
 
@@ -33,19 +33,19 @@ Then('Verify that the {string} button is enabled', async (btn_name: string) => {
   await commonFunctionPage.VerifyBtnEnabled(btn_name);
 });
 
-Then(/^Click on "([^"]*)" button until it disappears$/, async (btn_name: string) => {
+When(/^Click on "([^"]*)" button until it disappears$/, async (btn_name: string) => {
   await commonFunctionPage.ClickUntilDisappears(btn_name);
 });
 
-Then('Click on profile icon', async () => {
+When('Click on profile icon', async () => {
   await commonFunctionPage.ClickProfileIcon();
 });
 
-Then(/^Scroll "([^"]*)" until "([^"]*)" text is displayed$/, async (direction: string, targetText: string) => {
+When(/^Scroll "([^"]*)" until "([^"]*)" text is displayed$/, async (direction: string, targetText: string) => {
   await commonFunctionPage.Scroll(direction, targetText);
 });
 
-Then(/^Swipe "([^"]*)" until "([^"]*)" text is displayed$/, async (direction: string, targetText: string) => {
+When(/^Swipe "([^"]*)" until "([^"]*)" text is displayed$/, async (direction: string, targetText: string) => {
   await commonFunctionPage.Swipe(direction, targetText);
 });
 
@@ -60,29 +60,30 @@ Then(/^I verify text "([^"]*)" is displayed$/, async (text: string) => {
   await commonFunctionPage.VerifyTxt(text);
 });
 
-Then('Enter {string} into {string} Input', async (text: string, inputName: string) => {
-  await commonFunctionPage.EnterTextInInputField(text, inputName);
+When('Enter {string} into {string} Input', async (text: string, inputName: string) => {
+  const valueToEnter = process.env[text] || text;
+  await commonFunctionPage.EnterTextInInputField(valueToEnter, inputName);
 });
 
-Then('Enter captured order ID into {string} Input', async (inputName: string) => {
+When('Enter captured order ID into {string} Input', async (inputName: string) => {
   await commonFunctionPage.EnterCapturedOrderIdInInputField(inputName);
 });
 
-Then(/^Hit "([^"]*)" key$/, async (keyName: string) => {
+When(/^Hit "([^"]*)" key$/, async (keyName: string) => {
   await commonFunctionPage.HitKey(keyName);
 });
 
-Then('Type {string} on keyboard', async (text: string) => {
+When('Type {string} on keyboard', async (text: string) => {
   for (const char of text) {
     await commonFunctionPage.WriteInInputField(char);
   }
 });
 
-Then('Turn {string} Mobile location', async (targetState: string) => {
+Given('Turn {string} Mobile location', async (targetState: string) => {
   await commonFunctionPage.ToggleMobileLocation(targetState);
 });
 
-Then(/^Click on the mobile order card with captured order ID$/, async () => {
+When(/^Click on the mobile order card with captured order ID$/, async () => {
   const orderId = DataStore.get('orderId');
   if (!orderId) {
     throw new Error('No captured order ID found in DataStore');
@@ -91,11 +92,11 @@ Then(/^Click on the mobile order card with captured order ID$/, async () => {
   await commonFunctionPage.ClickCapturedOrderCard(orderId);
 });
 
-Then('Kill app and open it again', async () => {
+When('Kill app and open it again', async () => {
   await commonFunctionPage.KillAndReopenApp();
 });
 
-Then('Kill driver app and open it again', async () => {
+When('Kill driver app and open it again', async () => {
   await commonFunctionPage.KillAndReopenDriverApp();
 });
 

@@ -1,4 +1,4 @@
-import { Then as CucumberThen } from '@cucumber/cucumber';
+import { Given as CucumberGiven, When as CucumberWhen, Then as CucumberThen } from '@cucumber/cucumber';
 import { MobileLocators } from '../../locators/Mobile/MobileLocator';
 import { WebLocators } from '../../locators/Web/WebLocator';
 import { DriverLocators } from '../../locators/Driver/DriverLocator';
@@ -29,6 +29,22 @@ export function launchapp(fn: Function) {
   Object.defineProperty(wrapper, 'length', { value: fn.length, configurable: true });
   return wrapper;
 }
+
+export const Given = (pattern: any, optionsOrFn: any, fn?: any) => {
+  if (typeof optionsOrFn === 'function') {
+    CucumberGiven(pattern, launchapp(optionsOrFn));
+  } else {
+    CucumberGiven(pattern, optionsOrFn, launchapp(fn));
+  }
+};
+
+export const When = (pattern: any, optionsOrFn: any, fn?: any) => {
+  if (typeof optionsOrFn === 'function') {
+    CucumberWhen(pattern, launchapp(optionsOrFn));
+  } else {
+    CucumberWhen(pattern, optionsOrFn, launchapp(fn));
+  }
+};
 
 export const Then = (pattern: any, optionsOrFn: any, fn?: any) => {
   if (typeof optionsOrFn === 'function') {

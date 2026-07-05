@@ -230,7 +230,7 @@ export class CommonFunctionPage extends BasePage {
                 foundElement = element;
                 return true;
               }
-            } catch (e) {}
+            } catch (e) { }
           }
           return false;
         },
@@ -314,7 +314,7 @@ export class CommonFunctionPage extends BasePage {
               Logger.Info(`[Verification] Arabic text found on the screen.`);
               return true;
             }
-          } catch (e) {}
+          } catch (e) { }
           return false;
         },
         { timeout, interval: 1000 },
@@ -451,7 +451,7 @@ export class CommonFunctionPage extends BasePage {
 
       try {
         // Dynamically wait for the button to disappear (reverse wait) with zero hardcoded pause.
-        await btnElement!.waitForDisplayed({ timeout: 3000, reverse: true });
+        await btnElement!.waitForDisplayed({ timeout: 1000, reverse: true });
         isSuccess = true;
         break; // It disappeared, navigation successful!
       } catch (e) {
@@ -477,7 +477,7 @@ export class CommonFunctionPage extends BasePage {
           await fallback1.click();
           return;
         }
-      } catch (e) {}
+      } catch (e) { }
 
       try {
         const fallback1b = await this.browserInstance.$('//android.view.ViewGroup[@content-desc="Menu"]');
@@ -486,7 +486,7 @@ export class CommonFunctionPage extends BasePage {
           await fallback1b.click();
           return;
         }
-      } catch (e) {}
+      } catch (e) { }
 
       try {
         const fallback2 = await this.browserInstance.$(
@@ -497,7 +497,7 @@ export class CommonFunctionPage extends BasePage {
           await fallback2.click();
           return;
         }
-      } catch (e) {}
+      } catch (e) { }
 
       throw new Error(`Profile icon not found using any locators within ${CommonFunctionPage.DEFAULT_WAIT}ms`);
     }
@@ -590,7 +590,7 @@ export class CommonFunctionPage extends BasePage {
             foundElement = el;
             break;
           }
-        } catch (e) {}
+        } catch (e) { }
       }
 
       if (foundElement) {
@@ -675,7 +675,7 @@ export class CommonFunctionPage extends BasePage {
             foundElement = el;
             break;
           }
-        } catch (e) {}
+        } catch (e) { }
       }
 
       if (foundElement) {
